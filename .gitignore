@@ -13,7 +13,8 @@ yarn-error.log*
 .pnpm-debug.log*
 .DS_Store
 *.pem
-# Product Requirements
+# Product Requirements & Planning
+planning/
 EuroGrant_AI_PRD.md
 EuroGrant_AI_PRD_v1.docx
 og*
