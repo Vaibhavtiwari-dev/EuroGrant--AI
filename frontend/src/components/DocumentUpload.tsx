@@ -47,7 +47,6 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
     accept: {
       "application/pdf": [".pdf"],
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation": [".pptx"],
     },
     maxFiles: 1,
     disabled: isUploading,
@@ -92,7 +91,6 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
             <div className="mt-8 flex gap-3">
                <FileFormatTag label="PDF" />
                <FileFormatTag label="DOCX" />
-               <FileFormatTag label="PPTX" />
             </div>
           </div>
         )}
@@ -101,7 +99,7 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-2 opacity-50">
           <ShieldCheck className="text-emerald-400" size={14} />
-          <span className="text-[10px] font-data-mono text-slate-300 uppercase tracking-widest">End-to-End Encryption Active</span>
+          <span className="text-[10px] font-data-mono text-slate-300 uppercase tracking-widest">Secure TLS Transmission Active</span>
         </div>
         <span className="text-[10px] font-data-mono text-slate-500 uppercase tracking-widest">Max 25MB Per file</span>
       </div>
