@@ -63,14 +63,20 @@
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
 
-  --spacing-gutter: 24px;
-  --spacing-margin: 40px;
-  --spacing-lg: 48px;
-  --spacing-md: 24px;
-  --spacing-sm: 12px;
-  --spacing-xl: 80px;
-  --spacing-base: 8px;
-  --spacing-xs: 4px;
+  --spacing-gutter: 1.5rem;
+  --spacing-margin: 2.5rem;
+  --spacing-lg: 3rem;
+  --spacing-md: 1.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-xl: 5rem;
+  --spacing-base: 0.5rem;
+  --spacing-xs: 0.25rem;
+
+  /* UI Tokens for shadows and effects */
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --neon-glow: rgba(56, 189, 248, 0.5);
+  --neon-primary: rgba(56, 189, 248, 1);
 }
 
 @layer base {
@@ -102,7 +108,7 @@
     background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(2, 6, 23, 0.85) 100%);
     backdrop-filter: blur(32px);
     -webkit-backdrop-filter: blur(32px);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid var(--glass-border);
     box-shadow: 
       20px 0 40px -10px rgba(0, 0, 0, 0.5),
       inset -1px 0 0 rgba(255, 255, 255, 0.05),
@@ -121,11 +127,11 @@
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.4) 100%);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--glass-border);
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 
-      0 4px 6px -1px rgba(0, 0, 0, 0.2),
+      0 4px 6px -1px var(--shadow-color),
       0 2px 4px -1px rgba(0, 0, 0, 0.1),
       inset 0 1px 1px rgba(255, 255, 255, 0.05);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
@@ -135,20 +141,9 @@
   .glass-card:hover {
     transform: translateY(-4px) scale(1.005);
     box-shadow: 
-      0 20px 25px -5px rgba(0, 0, 0, 0.4),
+      0 20px 25px -5px var(--shadow-color),
       0 10px 10px -5px rgba(0, 0, 0, 0.3),
       inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  }
-
-  .glass-sidebar {
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(2, 6, 23, 0.85) 100%);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      20px 0 40px -10px rgba(0, 0, 0, 0.5),
-      inset -1px 0 0 rgba(255, 255, 255, 0.05),
-      inset 1px 0 0 rgba(255, 255, 255, 0.05);
   }
 
   .text-shadow-sm {
@@ -160,8 +155,8 @@
   }
 
   .neon-ring {
-    background: conic-gradient(from 180deg at 50% 50%, rgba(56, 189, 248, 0) 0deg, rgba(56, 189, 248, 0.1) 180deg, rgba(56, 189, 248, 1) 360deg);
-    filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+    background: conic-gradient(from 180deg at 50% 50%, rgba(56, 189, 248, 0) 0deg, rgba(56, 189, 248, 0.1) 180deg, var(--neon-primary) 360deg);
+    filter: drop-shadow(0 0 10px var(--neon-glow));
   }
 
   .custom-scrollbar::-webkit-scrollbar {
