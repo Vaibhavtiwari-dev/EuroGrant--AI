@@ -4,6 +4,7 @@ sqlalchemy
 psycopg2-binary
 alembic
 pydantic-settings
+pydantic[email]
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart
@@ -12,7 +13,7 @@ redis
 python-dotenv
 openai
 anthropic
-pinecone-client
+pinecone
 playwright
 beautifulsoup4
 pytest
