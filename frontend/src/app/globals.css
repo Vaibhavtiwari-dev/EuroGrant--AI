@@ -1,25 +1,190 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 249, 250, 251; /* gray-50 */
-  --background-end-rgb: 255, 255, 255;
+@theme {
+  --font-body-md: "Space Grotesk", sans-serif;
+  --font-body-lg: "Space Grotesk", sans-serif;
+  --font-label-sm: "Space Grotesk", sans-serif;
+  --font-headline-lg: "Noto Serif", serif;
+  --font-display-xl: "Noto Serif", serif;
+  --font-data-mono: "Space Grotesk", monospace;
+  --font-headline-md: "Noto Serif", serif;
+  --font-inter: "Inter", sans-serif;
+
+  --color-tertiary-fixed: #dae2fd;
+  --color-on-tertiary-fixed-variant: #3f465c;
+  --color-secondary: #b9c7df;
+  --color-inverse-on-surface: #2a3043;
+  --color-surface-tint: #c4c7c9;
+  --color-on-surface-variant: #c4c7c9;
+  --color-on-tertiary: #283044;
+  --color-surface: #0c1324;
+  --color-surface-bright: #33394c;
+  --color-on-primary: #2d3133;
+  --color-on-error: #690005;
+  --color-on-secondary-fixed: #0d1c2e;
+  --color-on-background: #dce1fb;
+  --color-outline: #8e9193;
+  --color-outline-variant: #444749;
+  --color-inverse-primary: #5c5f61;
+  --color-background: #0c1324;
+  --color-secondary-fixed: #d5e3fc;
+  --color-tertiary: #ffffff;
+  --color-primary-container: #e0e3e5;
+  --color-on-secondary-fixed-variant: #3a485b;
+  --color-surface-container-low: #151b2d;
+  --color-error: #ffb4ab;
+  --color-on-primary-fixed: #191c1e;
+  --color-surface-container-highest: #2e3447;
+  --color-on-tertiary-container: #5c647a;
+  --color-error-container: #93000a;
+  --color-on-primary-container: #626567;
+  --color-primary: #ffffff;
+  --color-surface-container: #191f31;
+  --color-secondary-container: #3c4a5e;
+  --color-surface-container-high: #23293c;
+  --color-primary-fixed: #e0e3e5;
+  --color-surface-dim: #0c1324;
+  --color-on-surface: #dce1fb;
+  --color-on-tertiary-fixed: #131b2e;
+  --color-primary-fixed-dim: #c4c7c9;
+  --color-surface-container-lowest: #070d1f;
+  --color-inverse-surface: #dce1fb;
+  --color-secondary-fixed-dim: #b9c7df;
+  --color-on-secondary: #233144;
+  --color-on-secondary-container: #abb9d1;
+  --color-on-primary-fixed-variant: #444749;
+  --color-on-error-container: #ffdad6;
+  --color-tertiary-container: #dae2fd;
+  --color-surface-variant: #2e3447;
+  --color-tertiary-fixed-dim: #bec6e0;
+
+  --radius-default: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+
+  --spacing-gutter: 24px;
+  --spacing-margin: 40px;
+  --spacing-lg: 48px;
+  --spacing-md: 24px;
+  --spacing-sm: 12px;
+  --spacing-xl: 80px;
+  --spacing-base: 8px;
+  --spacing-xs: 4px;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer base {
+  :root {
+    --foreground-rgb: 220, 225, 251;
+    --background-rgb: 12, 19, 36;
+  }
+
+  html {
+    @apply h-full overflow-x-hidden;
+  }
+
+  body {
+    color: rgb(var(--foreground-rgb));
+    background-color: rgb(var(--background-rgb));
+    background-image: 
+      linear-gradient(180deg, rgba(12, 19, 36, 0.5) 0%, rgba(12, 19, 36, 0.85) 100%),
+      url('/bridge-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    @apply antialiased min-h-[100dvh] relative overflow-x-hidden font-body-md;
+  }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .glass-sidebar {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(2, 6, 23, 0.85) 100%);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      20px 0 40px -10px rgba(0, 0, 0, 0.5),
+      inset -1px 0 0 rgba(255, 255, 255, 0.05),
+      inset 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* Keep alpine-bg as utility just in case, but refined */
+  .alpine-bg {
+    background-image: url('/bridge-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .glass-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.4) 100%);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.2),
+      0 2px 4px -1px rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+    will-change: transform;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-4px) scale(1.005);
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.4),
+      0 10px 10px -5px rgba(0, 0, 0, 0.3),
+      inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-sidebar {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.75) 0%, rgba(2, 6, 23, 0.85) 100%);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      20px 0 40px -10px rgba(0, 0, 0, 0.5),
+      inset -1px 0 0 rgba(255, 255, 255, 0.05),
+      inset 1px 0 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  }
+
+  .alpine-shadow {
+    box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.6), 0 0 20px rgba(56, 189, 248, 0.1);
+  }
+
+  .neon-ring {
+    background: conic-gradient(from 180deg at 50% 50%, rgba(56, 189, 248, 0) 0deg, rgba(56, 189, 248, 0.1) 180deg, rgba(56, 189, 248, 1) 360deg);
+    filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
