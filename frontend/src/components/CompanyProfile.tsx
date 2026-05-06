@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import { Building2, Users, Banknote, Shield, Globe, Cpu, Loader2, Sparkles, Activity } from "lucide-react";
+import { Building2, Users, Shield, Globe, Cpu, Loader2, Sparkles, Activity } from "lucide-react";
 
 interface Organization {
   name: string;
@@ -23,22 +23,25 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
   const [org, setOrg] = useState<Organization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchOrg = async () => {
-    try {
-      const response = await apiFetch("/organizations/me");
-      if (response.ok) {
-        const data = await response.json();
-        setOrg(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch organization:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    let ignore = false;
+    const fetchOrg = async () => {
+      try {
+        const response = await apiFetch("/organizations/me");
+        if (response.ok && !ignore) {
+          const data = await response.json();
+          setOrg(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch organization:", error);
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
     fetchOrg();
+    return () => { ignore = true; };
   }, [refreshKey]);
 
   if (isLoading) {
@@ -67,14 +70,29 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
   const countries = org.countries_of_operation ? JSON.parse(org.countries_of_operation) : [];
   const technologies = org.core_technologies ? JSON.parse(org.core_technologies) : [];
 
+  // Calculate dynamic metrics based on profile completeness and data
+  const calculateMetrics = () => {
+    const techScore = Math.min(60 + (technologies.length * 8), 98);
+    const marketScore = Math.min(65 + (countries.length * 10), 96);
+    const opScore = org.revenue_tier && org.revenue_tier !== "<1M" ? 92 : 78;
+    
+    return {
+      marketAlignment: marketScore,
+      operationalCapacity: opScore,
+      technicalMaturity: techScore
+    };
+  };
+
+  const metrics = calculateMetrics();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
       {/* Metrics Section */}
       <div className="col-span-1 space-y-8 pr-8 md:border-r border-white/10">
         <div className="space-y-6">
-          <HealthMetric label="Market Alignment" value={96} color="bg-sky-400" glow="shadow-[0_0_10px_rgba(56,189,248,0.5)]" />
-          <HealthMetric label="Operational Capacity" value={92} color="bg-emerald-400" glow="shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
-          <HealthMetric label="Technical Maturity" value={88} color="bg-indigo-400" glow="shadow-[0_0_10px_rgba(129,140,248,0.5)]" />
+          <HealthMetric label="Market Alignment" value={metrics.marketAlignment} color="bg-sky-400" glow="shadow-[0_0_10px_rgba(56,189,248,0.5)]" />
+          <HealthMetric label="Operational Capacity" value={metrics.operationalCapacity} color="bg-emerald-400" glow="shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
+          <HealthMetric label="Technical Maturity" value={metrics.technicalMaturity} color="bg-indigo-400" glow="shadow-[0_0_10px_rgba(129,140,248,0.5)]" />
         </div>
 
         <div className="pt-8 space-y-4">
