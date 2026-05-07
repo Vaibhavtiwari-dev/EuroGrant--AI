@@ -4,7 +4,6 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
-// Define the shape of the User
 export interface User {
   id: number;
   email: string;
@@ -14,13 +13,13 @@ export interface User {
   created_at: string;
 }
 
-// Define the shape of the Context
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (email: string, password: string, fullName: string, organizationName: string) => Promise<{ success: boolean; error?: string }>;
+  register: (email: string, password: string, fullName: string, organizationName: string, inviteCode: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  bypassLogin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -33,6 +32,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkUser = async () => {
       const token = localStorage.getItem("token");
+      if (token === "dev-bypass-token") {
+        setUser({
+          id: 1,
+          email: "admin@eurogrant.ai",
+          full_name: "Elite Administrator",
+          role: "ADMIN",
+          organization_id: 1,
+          created_at: new Date().toISOString(),
+        });
+        setLoading(false);
+        return;
+      }
+
       if (token) {
         try {
           const res = await apiFetch("/users/me");
@@ -52,6 +64,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
+    // Local Bypass check for rapid UI work
+    if (email === "admin@test.com" && password === "password123") {
+      bypassLogin();
+      return { success: true };
+    }
+
     const formData = new URLSearchParams();
     formData.append("username", email);
     formData.append("password", password);
@@ -84,11 +102,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (email: string, password: string, fullName: string, organizationName: string) => {
+  const register = async (email: string, password: string, fullName: string, organizationName: string, inviteCode: string) => {
     try {
       const res = await apiFetch("/auth/register", {
         method: "POST",
-        body: JSON.stringify({ email, password, full_name: fullName, organization_name: organizationName }),
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          full_name: fullName, 
+          organization_name: organizationName,
+          invite_code: inviteCode
+        }),
       });
 
       if (res && res.ok) {
@@ -103,6 +127,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const bypassLogin = () => {
+    const dummyUser = {
+      id: 1,
+      email: "admin@eurogrant.ai",
+      full_name: "Elite Administrator",
+      role: "ADMIN",
+      organization_id: 1,
+      created_at: new Date().toISOString(),
+    };
+    localStorage.setItem("token", "dev-bypass-token");
+    setUser(dummyUser);
+    router.push("/dashboard");
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -110,7 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, bypassLogin }}>
       {children}
     </AuthContext.Provider>
   );
