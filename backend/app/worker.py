@@ -28,12 +28,8 @@ def process_company_document(document_id: int):
             logger.error(f"Document {document_id} not found")
             return
 
-        # Download from S3
-        response = s3_service.s3_client.get_object(
-            Bucket=s3_service.bucket_name,
-            Key=doc.s3_key
-        )
-        file_content = response['Body'].read()
+        # Download from storage
+        file_content = s3_service.get_fileobj(doc.s3_key)
 
         # Extract text
         text = extraction_service.extract_text(file_content, doc.content_type)
