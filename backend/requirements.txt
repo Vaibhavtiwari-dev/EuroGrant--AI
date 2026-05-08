@@ -20,3 +20,4 @@ boto3
 pdfplumber
 python-docx
 langchain-text-splitters
+slowapi
