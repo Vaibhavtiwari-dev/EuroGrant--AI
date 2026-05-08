@@ -62,11 +62,16 @@ def process_company_document(document_id: int):
         db.close()
 
 def extract_company_profile(text: str, org_id: int, db):
+    # Sanitize input: remove triple backticks to prevent delimiter collision/hijack
+    safe_input = text[:4000].replace("```", " ")
+    
     prompt = f"""
-    You are an expert business analyst. Extract structured information from the following company description/document.
+    You are an expert business analyst. Extract structured information from the company document provided below delimited by triple backticks.
     
     Document text:
-    {text[:4000]}
+    ```
+    {safe_input}
+    ```
     
     Return a JSON object with the following fields:
     - sector (e.g., SaaS, FinTech, DeepTech, Pharma)
