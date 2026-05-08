@@ -90,9 +90,9 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
     const opScore = org.revenue_tier && org.revenue_tier !== "<1M" ? 92 : 78;
     
     return {
-      marketAlignment: marketScore,
-      operationalCapacity: opScore,
-      technicalMaturity: techScore
+      marketAlignment: Math.round(marketScore),
+      operationalCapacity: Math.round(opScore),
+      technicalMaturity: Math.round(techScore)
     };
   };
 
