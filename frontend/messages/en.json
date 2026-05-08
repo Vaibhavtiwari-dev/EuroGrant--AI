@@ -12,9 +12,26 @@
     "submit": "Submit Documentation"
   },
   "Header": {
-    "title": "Secure Terminal",
-    "status": "Status: Operational",
-    "profile": "Deep Dive"
+    "dashboardTitle": "Dashboard",
+    "searchPlaceholder": "Search insights...",
+    "authorizedAgent": "Authorized Agent",
+    "clearanceLevel": "Level 4 Clearance",
+    "secureTerminal": "Secure Terminal",
+    "statusOperational": "Status: Operational"
+  },
+  "Sidebar": {
+    "logoSubtitle": "Elite Intelligence",
+    "intelligence": "Intelligence",
+    "discovery": "Discovery",
+    "workbench": "Workbench",
+    "analytics": "Analytics",
+    "submit": "Submit Documentation",
+    "signOut": "Sign Out"
+  },
+  "DashboardHeader": {
+    "subtitle": "Executive Intelligence Dashboard",
+    "exportReport": "Export Report",
+    "newAnalysis": "New Analysis"
   },
   "Dashboard": {
     "probabilityTitle": "Probability Indicator",
@@ -29,5 +46,26 @@
     "support": "Supported: PDF, DOCX (Max 20MB)",
     "uploading": "Encrypting & Uploading...",
     "success": "Documentation Securely Uploaded"
+  },
+  "DocumentList": {
+    "title": "Intelligence Artifacts",
+    "empty": "No documentation artifacts detected in secure storage.",
+    "insightsFound": "{count} Insights Found",
+    "aiAlignment": "AI Alignment",
+    "vectorized": "Vectorized",
+    "verified": "Source document verified and indexed for grant matching models."
+  },
+  "CompanyProfile": {
+    "marketAlignment": "Market Alignment",
+    "operationalCapacity": "Operational Capacity",
+    "technicalMaturity": "Technical Maturity",
+    "personnel": "Personnel",
+    "noProfileTitle": "No Intelligence Profile Found",
+    "noProfileDesc": "Submit your company documentation to generate a comprehensive health and readiness profile.",
+    "querying": "Querying Profile Intelligence...",
+    "marketReach": "Market Reach (Jurisdictions)",
+    "techVectors": "Core Intelligence Vectors (Tech)",
+    "structuralIntegrity": "Structural Integrity Profile",
+    "crossValidation": "Cross-parameter AI validation active"
   }
 }

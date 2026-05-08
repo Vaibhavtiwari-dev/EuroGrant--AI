@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { FileText, Loader2, Radar } from "lucide-react";
 import { z } from "zod";
+import { useTranslations, useFormatter } from "next-intl";
 
 const DocumentSchema = z.object({
   id: z.number(),
@@ -21,6 +22,7 @@ interface DocumentListProps {
 }
 
 export default function DocumentList({ refreshKey }: DocumentListProps) {
+  const t = useTranslations("DocumentList");
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,7 +74,7 @@ export default function DocumentList({ refreshKey }: DocumentListProps) {
   if (documents.length === 0) {
     return (
       <div className="text-center p-12 border border-dashed border-white/10 rounded-xl bg-white/5 backdrop-blur-md">
-        <p className="text-slate-300 font-medium opacity-60 text-sm">Discovery feed is empty. Submit documentation to begin analysis.</p>
+        <p className="text-slate-300 font-medium opacity-60 text-sm">{t("empty")}</p>
       </div>
     );
   }
@@ -82,10 +84,10 @@ export default function DocumentList({ refreshKey }: DocumentListProps) {
       <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
         <h3 className="font-headline-md text-headline-md text-slate-300 flex items-center gap-3">
           <Radar className="text-sky-400" size={20} aria-hidden="true" />
-          Discovery Feed
+          {t("title")}
         </h3>
         <span className="font-label-sm text-sm text-slate-300 uppercase tracking-widest opacity-60">
-          {documents.length} Insights Found
+          {t("insightsFound", { count: documents.length })}
         </span>
       </div>
 
@@ -99,6 +101,9 @@ export default function DocumentList({ refreshKey }: DocumentListProps) {
 }
 
 function DocumentCard({ doc }: { doc: Document }) {
+  const t = useTranslations("DocumentList");
+  const format = useFormatter();
+
   const getStatusStyles = () => {
     switch (doc.status) {
       case "processed":
@@ -134,7 +139,7 @@ function DocumentCard({ doc }: { doc: Document }) {
           <div>
             <h4 className="font-headline-lg text-xl text-white mb-1 group-hover:text-sky-400 transition-colors">{doc.file_name}</h4>
             <p className="font-body-md text-sm text-slate-300 max-w-2xl">
-              Source document verified and indexed for grant matching models.
+              {t("verified")}
             </p>
           </div>
         </div>
@@ -144,12 +149,19 @@ function DocumentCard({ doc }: { doc: Document }) {
       </div>
       
       <div className="mt-6 flex flex-wrap gap-3">
-        <InsightTag label="AI Alignment" />
-        {doc.status === "processed" && <InsightTag label="Vectorized" active />}
+        <InsightTag label={t("aiAlignment")} />
+        {doc.status === "processed" && <InsightTag label={t("vectorized")} active />}
         <time className="ml-auto text-xs text-slate-500 font-data-mono uppercase tracking-widest flex items-center gap-2" dateTime={doc.created_at}>
-          {new Date(doc.created_at).toLocaleDateString()}
+          {format.dateTime(new Date(doc.created_at), {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
           <span className="w-1 h-1 bg-slate-600 rounded-full" aria-hidden="true"></span>
-          {new Date(doc.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {format.dateTime(new Date(doc.created_at), {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
         </time>
       </div>
     </div>

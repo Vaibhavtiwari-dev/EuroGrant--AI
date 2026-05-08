@@ -12,9 +12,26 @@
     "submit": "Unterlagen Einreichen"
   },
   "Header": {
-    "title": "Sicherer Terminal",
-    "status": "Status: Betriebsbereit",
-    "profile": "Detaillierte Analyse"
+    "dashboardTitle": "Dashboard",
+    "searchPlaceholder": "Einblicke suchen...",
+    "authorizedAgent": "Autorisierter Agent",
+    "clearanceLevel": "Freigabestufe 4",
+    "secureTerminal": "Sicherer Terminal",
+    "statusOperational": "Status: Betriebsbereit"
+  },
+  "Sidebar": {
+    "logoSubtitle": "Elite-Intelligenz",
+    "intelligence": "Intelligenz",
+    "discovery": "Entdeckung",
+    "workbench": "Werkbank",
+    "analytics": "Analyse",
+    "submit": "Dokumentation einreichen",
+    "signOut": "Abmelden"
+  },
+  "DashboardHeader": {
+    "subtitle": "Executive Intelligence Dashboard",
+    "exportReport": "Bericht exportieren",
+    "newAnalysis": "Neue Analyse"
   },
   "Dashboard": {
     "probabilityTitle": "Wahrscheinlichkeits-Indikator",
@@ -29,5 +46,26 @@
     "support": "Unterstützt: PDF, DOCX (Max. 20MB)",
     "uploading": "Verschlüsselung & Upload...",
     "success": "Dokumentation sicher hochgeladen"
+  },
+  "DocumentList": {
+    "title": "Intelligenz-Artefakte",
+    "empty": "Keine Dokumentationsartefakte im sicheren Speicher erkannt.",
+    "insightsFound": "{count} Einblicke gefunden",
+    "aiAlignment": "KI-Ausrichtung",
+    "vectorized": "Vektorisiert",
+    "verified": "Quelldokument verifiziert und für Abgleichmodelle indexiert."
+  },
+  "CompanyProfile": {
+    "marketAlignment": "Marktausrichtung",
+    "operationalCapacity": "Betriebliche Kapazität",
+    "technicalMaturity": "Technische Reife",
+    "personnel": "Personal",
+    "noProfileTitle": "Kein Intelligenzprofil gefunden",
+    "noProfileDesc": "Reichen Sie Ihre Unternehmensdokumentation ein, um ein umfassendes Gesundheits- und Bereitschaftsprofil zu erstellen.",
+    "querying": "Abfrage der Profil-Intelligenz...",
+    "marketReach": "Marktreichweite (Jurisdiktionen)",
+    "techVectors": "Kern-Intelligenz-Vektoren (Tech)",
+    "structuralIntegrity": "Strukturelles Integritätsprofil",
+    "crossValidation": "Parameterübergreifende KI-Validierung aktiv"
   }
 }

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { Building2, Users, Shield, Globe, Cpu, Loader2, Sparkles, Activity } from "lucide-react";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 
 const OrganizationSchema = z.object({
   name: z.string(),
@@ -23,6 +24,7 @@ interface CompanyProfileProps {
 }
 
 export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
+  const t = useTranslations("CompanyProfile");
   const [org, setOrg] = useState<Organization | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,9 +50,9 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center p-12" role="status" aria-label="Querying profile intelligence">
+      <div className="flex flex-col items-center justify-center p-12" role="status" aria-label={t("querying")}>
         <Loader2 className="h-8 w-8 text-sky-400 animate-spin mb-4" />
-        <p className="text-slate-300 font-bold text-sm">Querying Profile Intelligence...</p>
+        <p className="text-slate-300 font-bold text-sm">{t("querying")}</p>
       </div>
     );
   }
@@ -61,9 +63,9 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
         <div className="bg-sky-500/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(56,189,248,0.2)]" aria-hidden="true">
           <Sparkles className="h-8 w-8 text-sky-400" />
         </div>
-        <h3 className="text-xl font-headline-md text-white mb-2">No Intelligence Profile Found</h3>
+        <h3 className="text-xl font-headline-md text-white mb-2">{t("noProfileTitle")}</h3>
         <p className="text-slate-300 font-medium text-sm max-w-sm mx-auto">
-          Submit your company documentation to generate a comprehensive health and readiness profile.
+          {t("noProfileDesc")}
         </p>
       </div>
     );
@@ -101,9 +103,9 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
       {/* Metrics Section */}
       <div className="col-span-1 space-y-8 pr-8 md:border-r border-white/10">
         <div className="space-y-6" aria-label="Company health metrics">
-          <HealthMetric label="Market Alignment" value={metrics.marketAlignment} color="bg-sky-400" glow="shadow-[0_0_10px_rgba(56,189,248,0.5)]" />
-          <HealthMetric label="Operational Capacity" value={metrics.operationalCapacity} color="bg-emerald-400" glow="shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
-          <HealthMetric label="Technical Maturity" value={metrics.technicalMaturity} color="bg-indigo-400" glow="shadow-[0_0_10px_rgba(129,140,248,0.5)]" />
+          <HealthMetric label={t("marketAlignment")} value={metrics.marketAlignment} color="bg-sky-400" glow="shadow-[0_0_10px_rgba(56,189,248,0.5)]" />
+          <HealthMetric label={t("operationalCapacity")} value={metrics.operationalCapacity} color="bg-emerald-400" glow="shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
+          <HealthMetric label={t("technicalMaturity")} value={metrics.technicalMaturity} color="bg-indigo-400" glow="shadow-[0_0_10px_rgba(129,140,248,0.5)]" />
         </div>
 
         <div className="pt-8 space-y-4">
@@ -113,7 +115,7 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
           </div>
           <div className="flex items-center gap-3">
             <Users className="text-sky-400" size={16} aria-hidden="true" />
-            <span className="text-sm font-data-mono text-slate-300 uppercase tracking-widest">{org.headcount_range} Personnel</span>
+            <span className="text-sm font-data-mono text-slate-300 uppercase tracking-widest">{org.headcount_range} {t("personnel")}</span>
           </div>
           <div className="flex items-center gap-3">
             <Shield className="text-sky-400" size={16} aria-hidden="true" />
@@ -127,7 +129,7 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
         <div>
           <h4 className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
             <Globe className="h-3 w-3 text-sky-400" aria-hidden="true" />
-            Market Reach (Jurisdictions)
+            {t("marketReach")}
           </h4>
           <div className="flex flex-wrap gap-2" aria-label="Operating countries">
             {countries.map((country: string) => (
@@ -141,7 +143,7 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
         <div>
           <h4 className="flex items-center gap-2 text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
             <Cpu className="h-3 w-3 text-sky-400" aria-hidden="true" />
-            Core Intelligence Vectors (Tech)
+            {t("techVectors")}
           </h4>
           <div className="flex flex-wrap gap-2" aria-label="Core technologies">
             {technologies.map((tech: string) => (
@@ -159,8 +161,8 @@ export default function CompanyProfile({ refreshKey }: CompanyProfileProps) {
              <Activity className="text-sky-400 group-hover:scale-110 transition-transform" size={20} />
           </div>
           <div>
-            <p className="text-xs font-data-mono text-slate-300 uppercase tracking-widest">Structural Integrity Profile</p>
-            <p className="text-xs font-body-md text-slate-600">Cross-parameter AI validation active</p>
+            <p className="text-xs font-data-mono text-slate-300 uppercase tracking-widest">{t("structuralIntegrity")}</p>
+            <p className="text-xs font-body-md text-slate-600">{t("crossValidation")}</p>
           </div>
         </div>
       </div>
