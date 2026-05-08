@@ -1,0 +1,13 @@
+{
+  "Discovery": {
+    "title": "Discovery Feed",
+    "description": "Probability-ranked grants based on your company profile"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "uploads": "Uploads",
+    "settings": "Settings",
+    "logout": "Logout"
+  }
+}

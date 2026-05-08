@@ -1,0 +1,13 @@
+{
+  "Discovery": {
+    "title": "Discovery-Feed",
+    "description": "Wahrscheinlichkeits-Ranking basierend auf Ihrem Unternehmensprofil"
+  },
+  "Navigation": {
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "uploads": "Uploads",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  }
+}
