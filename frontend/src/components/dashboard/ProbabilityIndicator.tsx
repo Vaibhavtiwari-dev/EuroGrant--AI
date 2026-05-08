@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion, Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface ProbabilityIndicatorProps {
   variants: Variants;
@@ -9,11 +10,13 @@ interface ProbabilityIndicatorProps {
 }
 
 export default function ProbabilityIndicator({ variants, probability = 94 }: ProbabilityIndicatorProps) {
+  const t = useTranslations("Dashboard");
+
   return (
     <motion.div variants={variants} className="col-span-12 lg:col-span-4 h-full">
       <div className="glass-card rounded-2xl p-8 h-full flex flex-col items-center justify-center relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/50 pointer-events-none"></div>
-        <h3 className="font-headline-md text-headline-md text-slate-300 mb-8 self-start absolute top-8 left-8 text-shadow-sm">Global Probability</h3>
+        <h3 className="font-headline-md text-headline-md text-slate-300 mb-8 self-start absolute top-8 left-8 text-shadow-sm">{t("probabilityTitle")}</h3>
         <div className="relative w-48 h-48 mt-12 flex items-center justify-center">
           {/* Glowing Ring */}
           <div className="absolute inset-0 rounded-full neon-ring animate-[spin_10s_linear_infinite]"></div>
@@ -24,8 +27,9 @@ export default function ProbabilityIndicator({ variants, probability = 94 }: Pro
             <p className="font-label-sm text-label-sm text-sky-400 mt-2 uppercase tracking-widest">Optimal</p>
           </div>
         </div>
-        <p className="font-body-md text-body-md text-slate-300 text-center mt-8 z-10">Based on active parameters across EU frameworks.</p>
+        <p className="font-body-md text-body-md text-slate-300 text-center mt-8 z-10">{t("probabilityDesc")}</p>
       </div>
     </motion.div>
   );
 }
+

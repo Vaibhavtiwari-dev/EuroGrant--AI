@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { 
   BrainCircuit, 
   Compass, 
@@ -31,6 +32,8 @@ const sidebarVariants = {
 };
 
 export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen, logout }: SidebarProps) {
+  const t = useTranslations("Sidebar");
+
   return (
     <motion.nav 
       initial={false}
@@ -45,16 +48,16 @@ export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen,
           </div>
           <div>
             <h1 className="text-lg font-headline-lg italic text-white leading-tight">EuroGrant AI</h1>
-            <p className="text-[10px] text-slate-300 font-label-sm uppercase tracking-widest mt-0.5">Elite Intelligence</p>
+            <p className="text-[10px] text-slate-300 font-label-sm uppercase tracking-widest mt-0.5">{t("logoSubtitle")}</p>
           </div>
         </div>
       </div>
       
       <div className="flex-1 px-4 space-y-2">
-        <SidebarItem icon={<BrainCircuit size={18} />} label="Intelligence" active />
-        <SidebarItem icon={<Compass size={18} />} label="Discovery" />
-        <SidebarItem icon={<Briefcase size={18} />} label="Workbench" />
-        <SidebarItem icon={<LineChart size={18} />} label="Analytics" />
+        <SidebarItem icon={<BrainCircuit size={18} />} label={t("intelligence")} active />
+        <SidebarItem icon={<Compass size={18} />} label={t("discovery")} />
+        <SidebarItem icon={<Briefcase size={18} />} label={t("workbench")} />
+        <SidebarItem icon={<LineChart size={18} />} label={t("analytics")} />
       </div>
 
       <div className="px-4 mt-auto space-y-4">
@@ -64,7 +67,7 @@ export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen,
           onClick={() => setIsUploadModalOpen(true)}
           className="w-full py-3 px-4 rounded-lg bg-slate-800/50 border border-white/20 text-white text-sm font-headline-md hover:bg-slate-700/60 transition-colors flex items-center justify-center gap-2 group"
         >
-          <span>Submit Documentation</span>
+          <span>{t("submit")}</span>
           <Upload size={14} className="group-hover:translate-y-[-2px] transition-transform" />
         </motion.button>
         
@@ -73,7 +76,7 @@ export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen,
           className="w-full py-2 px-4 rounded-lg text-slate-300 text-xs font-label-sm hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-2"
         >
           <LogOut size={14} />
-          <span>Sign Out</span>
+          <span>{t("signOut")}</span>
         </button>
       </div>
     </motion.nav>
