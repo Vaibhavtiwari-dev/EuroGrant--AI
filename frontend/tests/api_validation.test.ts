@@ -42,7 +42,7 @@ describe('apiFetch Comprehensive Tests', () => {
     const { apiFetch } = await import('../src/lib/api');
     await apiFetch('/test', {}, TestSchema);
 
-    const callHeaders = (mockFetch.mock.calls[0][1] as any).headers;
+    const callHeaders = (mockFetch.mock.calls[0][1] as RequestInit).headers as Record<string, string>;
     expect(callHeaders['Authorization']).toBe('Bearer fake-token');
   });
 
