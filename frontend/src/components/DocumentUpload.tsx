@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, Loader2, ShieldCheck } from "lucide-react";
+import { Upload, Loader2, ShieldCheck, FileText } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -32,10 +32,10 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
         onUploadSuccess();
       } else {
         const error = await response.json();
-        toast.error(error.detail || "Failed to index document");
+        toast.error(error.detail || "Failed to index document. Ensure you are logged in.");
       }
     } catch (error) {
-      toast.error("Network analysis failed");
+      toast.error("Network analysis failed. Secure uplink unstable.");
       console.error(error);
     } finally {
       setIsUploading(false);
@@ -53,11 +53,11 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
   });
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-8">
       <div
         {...getRootProps()}
-        className={`relative w-full h-72 rounded-2xl flex flex-col items-center justify-center text-center transition-all duration-700 overflow-hidden group
-          ${isDragActive ? "neon-ring shadow-[0_0_50px_rgba(56,189,248,0.3)]" : "bg-slate-900/40 border border-dashed border-white/10 hover:border-sky-500/40 hover:bg-slate-900/60"}
+        className={`relative w-full h-80 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-500 overflow-hidden group
+          ${isDragActive ? "border-emerald-light bg-emerald/5 shadow-emerald" : "bg-forest-dark/20 border border-dashed border-outline hover:border-emerald-light/40 hover:bg-forest-dark/40"}
           ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
         `}
       >
@@ -65,30 +65,30 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
         
         {/* Animated background glow for drag active */}
         {isDragActive && (
-          <div className="absolute inset-0 bg-sky-500/5 animate-pulse pointer-events-none"></div>
+          <div className="absolute inset-0 bg-emerald/5 animate-pulse pointer-events-none"></div>
         )}
 
         {isUploading ? (
           <div className="flex flex-col items-center z-10">
-            <Loader2 className="h-14 w-14 text-sky-400 animate-spin mb-6" />
-            <h3 className="text-xl font-headline-md text-white mb-2">Analyzing Payload...</h3>
-            <p className="text-slate-500 text-xs font-data-mono uppercase tracking-[0.2em]">Neural extraction in progress</p>
+            <Loader2 className="h-16 w-16 text-emerald-light animate-spin mb-6" />
+            <h3 className="text-xl font-bold text-on-surface mb-2">Analyzing Payload...</h3>
+            <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.2em]">Neural extraction in progress</p>
           </div>
         ) : (
           <div className="flex flex-col items-center z-10 p-8">
-            <div className={`p-5 rounded-2xl mb-6 transition-all duration-500 ${isDragActive ? 'bg-sky-500/20 shadow-[0_0_20px_rgba(56,189,248,0.4)]' : 'bg-white/5 border border-white/5 group-hover:bg-sky-500/10 group-hover:border-sky-500/20'}`}>
-              <Upload className={`h-10 w-10 transition-colors duration-500 ${isDragActive ? 'text-white' : 'text-slate-300 group-hover:text-sky-400'}`} />
+            <div className={`p-6 rounded-lg mb-6 transition-all duration-500 ${isDragActive ? 'bg-emerald/20 shadow-emerald' : 'bg-surface border border-outline group-hover:bg-emerald/10 group-hover:border-emerald-light/20'}`}>
+              <Upload className={`h-10 w-10 transition-colors duration-500 ${isDragActive ? 'text-white' : 'text-on-surface-variant group-hover:text-emerald-light'}`} />
             </div>
             
-            <h3 className="text-xl font-headline-md text-white mb-3">
-              {isDragActive ? "Commit to Index" : "Ingest Document"}
+            <h3 className="text-2xl font-bold text-on-surface mb-3">
+              {isDragActive ? "Release to Index" : "Ingest Document"}
             </h3>
             
-            <p className="text-slate-300 font-body-md text-sm max-w-[280px] leading-relaxed">
-              Drag business plans or financials here to trigger automated AI profiling.
+            <p className="text-on-surface-variant text-sm max-w-[300px] leading-relaxed opacity-70">
+              Drag business plans, pitch decks or financials here to trigger automated AI profiling.
             </p>
             
-            <div className="mt-8 flex gap-3">
+            <div className="mt-10 flex gap-4">
                <FileFormatTag label="PDF" />
                <FileFormatTag label="DOCX" />
             </div>
@@ -97,11 +97,14 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
       </div>
 
       <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-2 opacity-50">
-          <ShieldCheck className="text-emerald-400" size={14} />
-          <span className="text-[10px] font-data-mono text-slate-300 uppercase tracking-widest">Secure TLS Transmission Active</span>
+        <div className="flex items-center gap-3 opacity-60">
+          <ShieldCheck className="text-emerald-light" size={16} />
+          <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Secure TLS Transmission Active</span>
         </div>
-        <span className="text-[10px] font-data-mono text-slate-500 uppercase tracking-widest">Max 25MB Per file</span>
+        <div className="flex items-center gap-2 opacity-60">
+           <FileText className="text-copper" size={16} />
+           <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Max 25MB</span>
+        </div>
       </div>
     </div>
   );
@@ -109,7 +112,7 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
 
 function FileFormatTag({ label }: { label: string }) {
   return (
-    <span className="bg-slate-800/50 text-slate-500 px-3 py-1 rounded font-data-mono text-[9px] border border-white/5 uppercase tracking-[0.2em] group-hover:text-slate-300 group-hover:border-white/10 transition-all">
+    <span className="bg-surface text-on-surface-variant px-4 py-1.5 rounded-md font-bold text-[10px] border border-outline uppercase tracking-[0.2em] group-hover:text-on-surface group-hover:border-emerald-light/20 transition-all">
       {label}
     </span>
   );
