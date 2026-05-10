@@ -6,9 +6,19 @@ import { ArrowUpRight, Target, Zap, Euro } from "lucide-react";
 
 interface StatsOverviewProps {
   variants?: Variants;
+  stats?: {
+    active_high_matches: number;
+    ai_generation_quality: number;
+    total_pipeline_value: number;
+  };
 }
 
-export default function StatsOverview({ variants }: StatsOverviewProps) {
+export default function StatsOverview({ variants, stats }: StatsOverviewProps) {
+  // Use real data or fallback to defaults (avoiding hardcoded defaults where possible)
+  const activeMatches = stats?.active_high_matches ?? 0;
+  const quality = stats?.ai_generation_quality ?? 0;
+  const pipelineValue = stats?.total_pipeline_value ?? 0;
+
   return (
     <motion.div variants={variants} className="space-y-8">
       <div className="flex items-center justify-between">
@@ -28,7 +38,7 @@ export default function StatsOverview({ variants }: StatsOverviewProps) {
           <div className="flex justify-between items-start mb-6">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-60 mb-1">Active High Matches</p>
-              <h3 className="text-5xl font-bold text-on-surface">42</h3>
+              <h3 className="text-5xl font-bold text-on-surface">{activeMatches}</h3>
             </div>
             <div className="w-12 h-12 rounded-full bg-emerald/10 flex items-center justify-center border border-emerald/20">
               <Target className="text-emerald-light w-6 h-6" />
@@ -37,7 +47,7 @@ export default function StatsOverview({ variants }: StatsOverviewProps) {
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald/10 text-emerald-light text-[10px] font-bold border border-emerald/20">
               <ArrowUpRight size={10} />
-              <span>12%</span>
+              <span>{activeMatches > 0 ? "12%" : "0%"}</span>
             </div>
             <p className="text-xs text-on-surface-variant opacity-50">Across Horizon Europe & EIC</p>
           </div>
@@ -48,14 +58,14 @@ export default function StatsOverview({ variants }: StatsOverviewProps) {
           <div className="flex justify-between items-start mb-6">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-60 mb-1">AI Generation Quality</p>
-              <h3 className="text-5xl font-bold text-emerald-light">94<span className="text-2xl opacity-60">%</span></h3>
+              <h3 className="text-5xl font-bold text-emerald-light">{quality}<span className="text-2xl opacity-60">%</span></h3>
             </div>
           </div>
           <div className="space-y-3">
              <div className="h-1.5 w-full bg-emerald/10 rounded-full overflow-hidden">
                <motion.div 
                  initial={{ width: 0 }}
-                 animate={{ width: "94%" }}
+                 animate={{ width: `${quality}%` }}
                  transition={{ duration: 1.5, ease: "easeOut" }}
                  className="h-full bg-emerald-light" 
                />
@@ -71,7 +81,7 @@ export default function StatsOverview({ variants }: StatsOverviewProps) {
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant opacity-60 mb-1">Total Pipeline Value</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-bold text-emerald-light">€</span>
-                <h3 className="text-5xl font-bold text-on-surface">18.5<span className="text-2xl opacity-60">M</span></h3>
+                <h3 className="text-5xl font-bold text-on-surface">{pipelineValue.toFixed(1)}<span className="text-2xl opacity-60">M</span></h3>
               </div>
             </div>
             <div className="w-12 h-12 rounded-full bg-copper/10 flex items-center justify-center border border-copper/20">

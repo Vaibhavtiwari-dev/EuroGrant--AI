@@ -11,6 +11,7 @@ import RAGProgress from "@/components/dashboard/RAGProgress";
 import HotMatches from "@/components/dashboard/HotMatches";
 import { useAuth } from "@/context/AuthContext";
 import { useDocumentPolling } from "@/hooks/useDocumentPolling";
+import { apiFetch } from "@/lib/api";
 import { X } from "lucide-react";
 
 // Animation variants
@@ -37,14 +38,36 @@ const itemVariants = {
   },
 };
 
+interface DashboardOverview {
+  stats: {
+    active_high_matches: number;
+    ai_generation_quality: number;
+    total_pipeline_value: number;
+  };
+  pipelines: Array<{
+    id: string;
+    title: string;
+    status: string;
+    progress: number;
+    subtext: string;
+  }>;
+  hot_matches: Array<{
+    title: string;
+    desc: string;
+    score: number;
+    time: string;
+  }>;
+}
+
 export default function DashboardPage() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const { triggerRefresh } = useDocumentPolling();
+  const { triggerRefresh, refreshKey } = useDocumentPolling();
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [overview, setOverview] = useState<DashboardOverview | null>(null);
 
   // Auth Guard
   useEffect(() => {
@@ -52,6 +75,24 @@ export default function DashboardPage() {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  // Fetch Overview Data
+  useEffect(() => {
+    const fetchOverview = async () => {
+      if (user) {
+        try {
+          const res = await apiFetch("/organizations/dashboard-overview");
+          if (res.ok) {
+            const data = await res.json();
+            setOverview(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch dashboard overview", error);
+        }
+      }
+    };
+    fetchOverview();
+  }, [user, refreshKey]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -102,15 +143,15 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 lg:col-span-8 space-y-12">
-              <StatsOverview variants={itemVariants} />
+              <StatsOverview variants={itemVariants} stats={overview?.stats} />
               <motion.div variants={itemVariants}>
-                <RAGProgress />
+                <RAGProgress pipelines={overview?.pipelines || []} />
               </motion.div>
             </div>
 
             <div className="col-span-12 lg:col-span-4">
               <motion.div variants={itemVariants}>
-                <HotMatches />
+                <HotMatches matches={overview?.hot_matches || []} />
               </motion.div>
             </div>
           </div>
