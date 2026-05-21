@@ -78,4 +78,22 @@ class VectorService:
         self.index.upsert(vectors=vectors, namespace=namespace)
         logger.info(f"Upserted {len(vectors)} chunks for document {doc_id} to Pinecone namespace {namespace}")
 
+    def upsert_grant(self, grant_id: int, text: str, metadata: dict):
+        chunks = self.text_splitter.split_text(text)
+        vectors = []
+        for i, chunk in enumerate(chunks):
+            embedding = self.generate_embeddings(chunk)
+            vectors.append({
+                "id": f"grant_{grant_id}_chunk_{i}",
+                "values": embedding,
+                "metadata": {
+                    "grant_id": grant_id,
+                    **metadata,
+                    "text": chunk
+                }
+            })
+        self.index.upsert(vectors=vectors, namespace="grants")
+        logger.info(f"Upserted {len(vectors)} chunks for grant {grant_id} to Pinecone namespace grants")
+
 vector_service = VectorService()
+
