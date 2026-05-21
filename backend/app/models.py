@@ -54,6 +54,7 @@ class Grant(Base):
     eligibility_criteria = Column(Text)
     scoring_rubric = Column(Text)
     source_url = Column(String)
+    sector_tags = Column(Text) # JSON string array
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class ProposalStatus(str, enum.Enum):
