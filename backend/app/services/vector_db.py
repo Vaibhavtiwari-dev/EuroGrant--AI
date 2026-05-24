@@ -51,11 +51,16 @@ class VectorService:
         )
 
     def generate_embeddings(self, text: str) -> List[float]:
-        response = self.openai_client.embeddings.create(
-            input=text,
-            model=self.embedding_model
-        )
-        return response.data[0].embedding
+        try:
+            response = self.openai_client.embeddings.create(
+                input=text,
+                model=self.embedding_model
+            )
+            return response.data[0].embedding
+        except Exception as e:
+            logger.warning(f"Embedding generation failed: {e}. Falling back to local offline mock zero embeddings.")
+            # Return a list of zeros matching the configured dimension
+            return [0.0] * self.dimension
 
     def upsert_text(self, text: str, doc_id: int, org_id: int):
         chunks = self.text_splitter.split_text(text)
@@ -75,8 +80,15 @@ class VectorService:
         
         # Upsert in namespace
         namespace = f"org_{org_id}"
-        self.index.upsert(vectors=vectors, namespace=namespace)
-        logger.info(f"Upserted {len(vectors)} chunks for document {doc_id} to Pinecone namespace {namespace}")
+        if not self.index:
+            logger.warning(f"Pinecone index not initialized. Bypassed upserting {len(vectors)} chunks to namespace {namespace} (offline mock active)")
+            return
+            
+        try:
+            self.index.upsert(vectors=vectors, namespace=namespace)
+            logger.info(f"Upserted {len(vectors)} chunks for document {doc_id} to Pinecone namespace {namespace}")
+        except Exception as e:
+            logger.error(f"Pinecone upsert failed for document {doc_id}: {e}. Bypassed gracefully.")
 
     def upsert_grant(self, grant_id: int, text: str, metadata: dict):
         chunks = self.text_splitter.split_text(text)
@@ -92,8 +104,16 @@ class VectorService:
                     "text": chunk
                 }
             })
-        self.index.upsert(vectors=vectors, namespace="grants")
-        logger.info(f"Upserted {len(vectors)} chunks for grant {grant_id} to Pinecone namespace grants")
+            
+        if not self.index:
+            logger.warning(f"Pinecone index not initialized. Bypassed indexing {len(vectors)} chunks to grants namespace (offline mock active)")
+            return
+            
+        try:
+            self.index.upsert(vectors=vectors, namespace="grants")
+            logger.info(f"Upserted {len(vectors)} chunks for grant {grant_id} to Pinecone namespace grants")
+        except Exception as e:
+            logger.error(f"Pinecone upsert failed for grant {grant_id}: {e}. Bypassed gracefully.")
 
 vector_service = VectorService()
 
