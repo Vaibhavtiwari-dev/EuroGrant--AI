@@ -31,8 +31,7 @@ describe('apiFetch Comprehensive Tests', () => {
     expect(result).toEqual(mockData);
   });
 
-  it('should include Authorization header when token exists', async () => {
-    localStorage.setItem('token', 'fake-token');
+  it('should include credentials for cookie-based auth', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -42,8 +41,8 @@ describe('apiFetch Comprehensive Tests', () => {
     const { apiFetch } = await import('../src/lib/api');
     await apiFetch('/test', {}, TestSchema);
 
-    const callHeaders = (mockFetch.mock.calls[0][1] as RequestInit).headers as Record<string, string>;
-    expect(callHeaders['Authorization']).toBe('Bearer fake-token');
+    const callOptions = mockFetch.mock.calls[0][1] as RequestInit;
+    expect(callOptions.credentials).toBe('include');
   });
 
   it('should handle 401 and redirect to login', async () => {
