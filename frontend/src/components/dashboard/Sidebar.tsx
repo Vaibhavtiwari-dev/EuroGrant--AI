@@ -19,6 +19,8 @@ interface SidebarProps {
   setIsSidebarOpen: (open: boolean) => void;
   setIsUploadModalOpen: (open: boolean) => void;
   logout: () => void;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
 }
 
 const sidebarVariants = {
@@ -32,7 +34,7 @@ const sidebarVariants = {
   }
 };
 
-export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen }: SidebarProps) {
+export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen, activeTab = "dashboard", setActiveTab }: SidebarProps) {
   const t = useTranslations("Sidebar");
 
   return (
@@ -67,24 +69,50 @@ export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen 
       </div>
       
       <div className="flex-1 px-4 space-y-2">
-        <SidebarItem icon={<LayoutDashboard size={20} />} label={t("dashboard")} active />
-        <SidebarItem icon={<BarChart2 size={20} />} label={t("analytics")} />
-        <SidebarItem icon={<Search size={20} />} label="Grant Search" />
-        <SidebarItem icon={<FileText size={20} />} label="My Proposals" />
+        <SidebarItem 
+          icon={<LayoutDashboard size={20} />} 
+          label={t("dashboard")} 
+          active={activeTab === "dashboard"} 
+          onClick={() => setActiveTab?.("dashboard")}
+        />
+        <SidebarItem 
+          icon={<Search size={20} />} 
+          label={t("discovery")} 
+          active={activeTab === "discovery"} 
+          onClick={() => setActiveTab?.("discovery")}
+        />
+        <SidebarItem 
+          icon={<BarChart2 size={20} />} 
+          label={t("analytics")} 
+          active={activeTab === "analytics"} 
+          onClick={() => setActiveTab?.("analytics")}
+        />
+        <SidebarItem 
+          icon={<FileText size={20} />} 
+          label="My Proposals" 
+          active={activeTab === "proposals"} 
+          onClick={() => setActiveTab?.("proposals")}
+        />
       </div>
 
       <div className="px-4 mt-auto">
-        <SidebarItem icon={<Settings size={20} />} label={t("settings")} />
+        <SidebarItem 
+          icon={<Settings size={20} />} 
+          label={t("settings")} 
+          active={activeTab === "settings"} 
+          onClick={() => setActiveTab?.("settings")}
+        />
       </div>
     </motion.nav>
   );
 }
 
-function SidebarItem({ icon, label, active = false }: { icon: React.ReactNode; label: string; active?: boolean }) {
+function SidebarItem({ icon, label, active = false, onClick }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void }) {
   return (
     <motion.button 
       whileHover={{ x: 4 }}
       whileTap={{ scale: 0.98 }}
+      onClick={onClick}
       className={`relative w-full flex items-center gap-4 px-5 py-3.5 rounded-lg font-semibold transition-all duration-200 group ${
         active 
           ? "text-emerald-light bg-emerald/5 border border-emerald/10 shadow-sm" 

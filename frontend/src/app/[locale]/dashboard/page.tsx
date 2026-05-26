@@ -9,6 +9,8 @@ import Header from "@/components/dashboard/Header";
 import StatsOverview from "@/components/dashboard/StatsOverview";
 import RAGProgress from "@/components/dashboard/RAGProgress";
 import HotMatches from "@/components/dashboard/HotMatches";
+import MatchedGrants from "@/components/dashboard/MatchedGrants";
+import NotificationSettings from "@/components/dashboard/NotificationSettings";
 import { useAuth } from "@/context/AuthContext";
 import { useDocumentPolling } from "@/hooks/useDocumentPolling";
 import { apiFetch } from "@/lib/api";
@@ -68,6 +70,7 @@ export default function DashboardPage() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Auth Guard
   useEffect(() => {
@@ -127,6 +130,8 @@ export default function DashboardPage() {
         setIsSidebarOpen={setIsSidebarOpen}
         setIsUploadModalOpen={setIsUploadModalOpen}
         logout={logout}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
       />
 
       <Header 
@@ -141,20 +146,41 @@ export default function DashboardPage() {
         className="relative z-10 md:ml-64 pt-12 px-12 pb-32 min-h-screen hero-gradient"
       >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-12 gap-10">
-            <div className="col-span-12 lg:col-span-8 space-y-12">
-              <StatsOverview variants={itemVariants} stats={overview?.stats} />
-              <motion.div variants={itemVariants}>
-                <RAGProgress pipelines={overview?.pipelines || []} />
-              </motion.div>
-            </div>
+          {activeTab === "dashboard" && (
+            <div className="grid grid-cols-12 gap-10">
+              <div className="col-span-12 lg:col-span-8 space-y-12">
+                <StatsOverview variants={itemVariants} stats={overview?.stats} />
+                <motion.div variants={itemVariants}>
+                  <RAGProgress pipelines={overview?.pipelines || []} />
+                </motion.div>
+              </div>
 
-            <div className="col-span-12 lg:col-span-4">
-              <motion.div variants={itemVariants}>
-                <HotMatches matches={overview?.hot_matches || []} />
-              </motion.div>
+              <div className="col-span-12 lg:col-span-4">
+                <motion.div variants={itemVariants}>
+                  <HotMatches matches={overview?.hot_matches || []} />
+                </motion.div>
+              </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === "discovery" && (
+            <motion.div variants={itemVariants}>
+              <MatchedGrants />
+            </motion.div>
+          )}
+
+          {activeTab === "settings" && (
+            <motion.div variants={itemVariants}>
+              <NotificationSettings />
+            </motion.div>
+          )}
+
+          {activeTab !== "dashboard" && activeTab !== "discovery" && activeTab !== "settings" && (
+            <div className="py-20 text-center space-y-4">
+              <h3 className="text-2xl font-bold">Feature Coming Soon</h3>
+              <p className="text-on-surface-variant text-sm">This module is part of a future roadmap release.</p>
+            </div>
+          )}
         </div>
       </motion.main>
 

@@ -96,6 +96,35 @@
     "navLogin": "Anmelden",
     "navGetStarted": "Loslegen"
   },
+  "MatchedGrants": {
+    "title": "Gefundene Ausschreibungen",
+    "description": "KI-selektierte Förderausschreibungen, maßgeschneidert auf Ihr Unternehmensprofil",
+    "loading": "Kompatibilität wird analysiert...",
+    "noMatchesTitle": "Keine Übereinstimmungen gefunden",
+    "noMatchesDesc": "Keine Dokumente im sicheren Speicher erkannt. Laden Sie Ihr Unternehmensprofil hoch, um den Abgleich zu starten.",
+    "whyItMatches": "Warum dies übereinstimmt",
+    "compatibility": "Kompatibilität",
+    "funding": "Förderhöhe",
+    "deadline": "Frist",
+    "viewDetails": "Offizielles Portal",
+    "generateProposal": "Vorschlag generieren"
+  },
+  "NotificationSettings": {
+    "title": "Benachrichtigungseinstellungen",
+    "description": "Konfigurieren Sie Benachrichtigungsschwellenwerte und Aktualisierungskanäle für semantische Matching-Alerts.",
+    "loading": "Berechtigungen werden abgerufen...",
+    "matchingAlertsHeader": "Semantisches Grant-Matching",
+    "emailAlertsLabel": "E-Mail-Benachrichtigungen",
+    "emailAlertsDesc": "Tägliche Zusammenfassung neu gefundener Ausschreibungen senden, die über Ihrem Ziel-Schwellenwert liegen.",
+    "thresholdLabel": "Mindestkompatibilitätsschwelle",
+    "thresholdDesc": "Erhalten Sie nur Alerts und markieren Sie Übereinstimmungen oberhalb dieses Ähnlichkeitswerts.",
+    "thresholdMin": "Breit",
+    "thresholdRecommended": "Empfohlen",
+    "thresholdMax": "Präzise",
+    "secureTransmission": "Übertragung verschlüsselt",
+    "saveButton": "Einstellungen speichern",
+    "saveSuccess": "Einstellungen erfolgreich aktualisiert"
+  },
   "Error": {
     "title": "Systembruch / Kritischer Fehler",
     "description": "Die Anwendung hat eine unerwartete Protokollverletzung festgestellt. Die Systemdiagnose weist auf eine kritische Ausnahme hin.",

@@ -96,6 +96,35 @@
     "navLogin": "Login",
     "navGetStarted": "Get Started"
   },
+  "MatchedGrants": {
+    "title": "Matched Grants",
+    "description": "AI-selected grant opportunities tailored to your company profile",
+    "loading": "Analyzing compatibility...",
+    "noMatchesTitle": "No Matches Found",
+    "noMatchesDesc": "No documentation artifacts detected in secure storage. Upload your business profile to trigger semantic matching.",
+    "whyItMatches": "Why this matches",
+    "compatibility": "Compatibility",
+    "funding": "Funding Amount",
+    "deadline": "Deadline",
+    "viewDetails": "Official Portal",
+    "generateProposal": "Generate Proposal"
+  },
+  "NotificationSettings": {
+    "title": "Notification Settings",
+    "description": "Configure alert thresholds and update channels for semantic matching alerts.",
+    "loading": "Retrieving credentials...",
+    "matchingAlertsHeader": "Semantic Grant Matching",
+    "emailAlertsLabel": "Email Notifications",
+    "emailAlertsDesc": "Send daily digest of newly matched grants that score above your target threshold.",
+    "thresholdLabel": "Minimum Compatibility Threshold",
+    "thresholdDesc": "Only receive alerts and highlight matches above this similarity score.",
+    "thresholdMin": "Broad",
+    "thresholdRecommended": "Recommended",
+    "thresholdMax": "Precise",
+    "secureTransmission": "Transmission Encrypted",
+    "saveButton": "Save Preferences",
+    "saveSuccess": "Preferences Updated Successfully"
+  },
   "Error": {
     "title": "System Breach / Critical Failure",
     "description": "The application has encountered an unexpected protocol breach. System diagnostic indicates a critical exception.",
