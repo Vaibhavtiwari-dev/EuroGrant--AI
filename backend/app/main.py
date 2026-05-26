@@ -5,7 +5,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from . import models, schemas
-from .routers import auth as auth_router, uploads as uploads_router, organizations as organizations_router
+from .routers import auth as auth_router, uploads as uploads_router, organizations as organizations_router, grants as grants_router
 from .auth import get_current_user
 
 # Initialize Rate Limiter
@@ -35,6 +35,7 @@ api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(auth_router.router)
 api_v1_router.include_router(uploads_router.router)
 api_v1_router.include_router(organizations_router.router)
+api_v1_router.include_router(grants_router.router)
 
 # Include versioned router in app
 app.include_router(api_v1_router)

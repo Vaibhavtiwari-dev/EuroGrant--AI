@@ -26,8 +26,13 @@ def create_test_db():
         os.remove(TEST_DB_FILE)
     Base.metadata.create_all(bind=engine)
     yield
-    # On Windows, we might have file locks, so we don't remove here.
-    # It will be removed at the start of the next run if it exists.
+    engine.dispose()
+    try:
+        if os.path.exists(TEST_DB_FILE):
+            os.remove(TEST_DB_FILE)
+    except Exception:
+        pass
+
 
 @pytest.fixture
 def db_session():
@@ -36,6 +41,17 @@ def db_session():
         yield db
     finally:
         db.close()
+
+@pytest.fixture(autouse=True)
+def clean_db(db_session):
+    yield
+    # Clean up all tables in reverse dependency order to ensure isolation
+    db_session.query(models.GrantMatch).delete()
+    db_session.query(models.CompanyDocument).delete()
+    db_session.query(models.User).delete()
+    db_session.query(models.Grant).delete()
+    db_session.query(models.Organization).delete()
+    db_session.commit()
 
 def override_get_db():
     try:

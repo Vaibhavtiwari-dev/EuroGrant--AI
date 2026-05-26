@@ -127,3 +127,77 @@ def test_vector_service_search_grants_fallback_exception():
         # Should catch exception and return mock results
         assert len(results) == 1
         assert results[0]["grant_id"] == 1
+
+
+def test_notification_service_local_mode():
+    from app.services.notifications import NotificationService
+    from unittest.mock import patch
+
+    with patch.dict("os.environ", {"NOTIFICATION_BACKEND": "local"}):
+        service = NotificationService()
+        assert not service.use_ses
+        assert service.client is None
+        
+        # Test sending alert in local mode
+        success = service.send_match_alert("test@example.com", "Test Grant", 0.85, "Explanation text")
+        assert success is True
+
+
+def test_notification_service_ses_mode_success():
+    from app.services.notifications import NotificationService
+    from unittest.mock import MagicMock, patch
+
+    mock_client = MagicMock()
+    mock_client.send_email.return_value = {"MessageId": "12345"}
+
+    with patch.dict("os.environ", {
+        "NOTIFICATION_BACKEND": "ses",
+        "AWS_ACCESS_KEY_ID": "real_key",
+        "AWS_SECRET_ACCESS_KEY": "real_secret",
+        "AWS_SES_REGION": "us-east-1",
+        "SES_SENDER_EMAIL": "sender@example.com"
+    }):
+        with patch("boto3.client", return_value=mock_client) as mock_boto3:
+            service = NotificationService()
+            assert service.use_ses
+            assert service.client is not None
+            mock_boto3.assert_called_once_with(
+                "ses",
+                aws_access_key_id="real_key",
+                aws_secret_access_key="real_secret",
+                region_name="us-east-1"
+            )
+
+            success = service.send_match_alert("user@example.com", "Test Grant", 0.9, "Matches perfectly")
+            assert success is True
+            assert mock_client.send_email.called
+            args, kwargs = mock_client.send_email.call_args
+            assert kwargs["Source"] == "sender@example.com"
+            assert kwargs["Destination"]["ToAddresses"] == ["user@example.com"]
+            assert "Test Grant" in kwargs["Message"]["Subject"]["Data"]
+
+
+def test_notification_service_ses_mode_failure_fallback():
+    from app.services.notifications import NotificationService
+    from botocore.exceptions import ClientError
+    from unittest.mock import MagicMock, patch
+
+    mock_client = MagicMock()
+    mock_client.send_email.side_effect = ClientError(
+        error_response={"Error": {"Code": "MessageRejected", "Message": "Email address not verified"}},
+        operation_name="SendEmail"
+    )
+
+    with patch.dict("os.environ", {
+        "NOTIFICATION_BACKEND": "ses",
+        "AWS_ACCESS_KEY_ID": "real_key",
+        "AWS_SECRET_ACCESS_KEY": "real_secret"
+    }):
+        with patch("boto3.client", return_value=mock_client):
+            service = NotificationService()
+            assert service.use_ses
+            
+            # Should catch ClientError, log it, and return True as fallback
+            success = service.send_match_alert("user@example.com", "Test Grant", 0.9, "Matches perfectly")
+            assert success is True
+

@@ -2,11 +2,12 @@ import os
 import json
 from celery import Celery
 from .database import SessionLocal
-from .models import CompanyDocument, DocumentStatus, Organization, Grant
+from .models import CompanyDocument, DocumentStatus, Organization, Grant, GrantMatch
 from .services.s3 import s3_service
 from .services.extraction import extraction_service, redact_pii
 from .services.vector_db import vector_service
 from .services.discovery import discovery_service
+from .services.notifications import notification_service
 from openai import OpenAI
 import logging
 
@@ -31,6 +32,10 @@ celery_app.conf.beat_schedule = {
     "daily-grant-scraping": {
         "task": "scrape_grants",
         "schedule": crontab(hour=2, minute=0),  # Execute at 2:00 AM UTC daily
+    },
+    "periodic-match-scanning": {
+        "task": "scan_for_new_matches",
+        "schedule": crontab(hour=3, minute=0),  # Execute at 3:00 AM UTC daily
     },
 }
 
@@ -211,5 +216,147 @@ def scrape_grants():
 
     except Exception as e:
         logger.error(f"Critical failure in scrape_grants task execution: {e}")
+    finally:
+        db.close()
+
+
+@celery_app.task(name="scan_for_new_matches")
+def scan_for_new_matches():
+    """
+    Periodic task to scan all organizations for new grant matches
+    exceeding their configured match threshold, and send email alerts.
+    """
+    logger.info("Initiating periodic match scanning task")
+    db = SessionLocal()
+    try:
+        # Get all organizations
+        organizations = db.query(Organization).all()
+        logger.info(f"Scanning matches for {len(organizations)} organizations")
+        
+        for org in organizations:
+            if not org.alert_email_enabled:
+                logger.info(f"Email alerts disabled for organization {org.id} ({org.name}), skipping.")
+                continue
+            
+            # Construct profile query
+            profile_components = []
+            if org.sector:
+                profile_components.append(f"Sector: {org.sector}")
+            if org.core_technologies:
+                try:
+                    tech_list = json.loads(org.core_technologies)
+                    if isinstance(tech_list, list):
+                        profile_components.append(f"Core Technologies: {', '.join(tech_list)}")
+                    else:
+                        profile_components.append(f"Core Technologies: {org.core_technologies}")
+                except Exception:
+                    profile_components.append(f"Core Technologies: {org.core_technologies}")
+            if org.countries_of_operation:
+                try:
+                    countries_list = json.loads(org.countries_of_operation)
+                    if isinstance(countries_list, list):
+                        profile_components.append(f"Countries of Operation: {', '.join(countries_list)}")
+                    else:
+                        profile_components.append(f"Countries of Operation: {org.countries_of_operation}")
+                except Exception:
+                    profile_components.append(f"Countries of Operation: {org.countries_of_operation}")
+            if org.headcount_range:
+                profile_components.append(f"Headcount: {org.headcount_range}")
+            if org.revenue_tier:
+                profile_components.append(f"Revenue Tier: {org.revenue_tier}")
+                
+            profile_query = ". ".join(profile_components)
+            if not profile_query:
+                logger.warning(f"Organization {org.id} has no profile attributes populated, using name as query.")
+                profile_query = f"Company: {org.name}"
+                
+            # Perform search against grants namespace
+            matches = vector_service.search_grants(profile_query, top_k=10)
+            logger.info(f"Found {len(matches)} potential matches for organization {org.id}")
+            
+            threshold = org.match_threshold if org.match_threshold is not None else 0.7
+            
+            for match in matches:
+                score = match.get("score")
+                grant_id = match.get("grant_id")
+                
+                if score is None or grant_id is None:
+                    continue
+                
+                try:
+                    grant_id = int(grant_id)
+                except (ValueError, TypeError):
+                    logger.error(f"Invalid grant_id format in match: {grant_id}")
+                    continue
+                
+                if score >= threshold:
+                    # Check if an alert was already sent
+                    existing_match = db.query(GrantMatch).filter(
+                        GrantMatch.organization_id == org.id,
+                        GrantMatch.grant_id == grant_id
+                    ).first()
+                    
+                    if existing_match and existing_match.alert_sent:
+                        # Already sent alert
+                        continue
+                    
+                    # Fetch grant details
+                    grant = db.query(Grant).filter(Grant.id == grant_id).first()
+                    if not grant:
+                        logger.warning(f"Grant {grant_id} found in vector DB but not in relational DB, skipping.")
+                        continue
+                        
+                    # Generate explanation using extraction_service
+                    explanation = extraction_service.explain_match(profile_query, grant.description)
+                    
+                    # Fetch active users to notify
+                    active_users = [u for u in org.users if u.is_active]
+                    if not active_users:
+                        logger.warning(f"No active users found for organization {org.id}, cannot send email alerts.")
+                        # Save the match in DB anyway but keep alert_sent=False since we couldn't send email
+                        if not existing_match:
+                            new_match = GrantMatch(
+                                organization_id=org.id,
+                                grant_id=grant_id,
+                                score=score,
+                                explanation=explanation,
+                                alert_sent=False
+                            )
+                            db.add(new_match)
+                            db.commit()
+                        continue
+                    
+                    # Send alert emails to all active users
+                    emails_sent_successfully = True
+                    for user in active_users:
+                        sent = notification_service.send_match_alert(
+                            email=user.email,
+                            grant_title=grant.title,
+                            score=score,
+                            explanation=explanation
+                        )
+                        if not sent:
+                            emails_sent_successfully = False
+                            
+                    # Update or insert GrantMatch record
+                    if existing_match:
+                        existing_match.score = score
+                        existing_match.explanation = explanation
+                        existing_match.alert_sent = emails_sent_successfully
+                    else:
+                        new_match = GrantMatch(
+                            organization_id=org.id,
+                            grant_id=grant_id,
+                            score=score,
+                            explanation=explanation,
+                            alert_sent=emails_sent_successfully
+                        )
+                        db.add(new_match)
+                    db.commit()
+                    logger.info(f"Processed match for org {org.id} and grant {grant_id} (alert_sent={emails_sent_successfully})")
+
+    except Exception as e:
+        logger.error(f"Error in scan_for_new_matches task: {e}")
+        db.rollback()
     finally:
         db.close()
