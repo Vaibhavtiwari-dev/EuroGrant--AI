@@ -40,4 +40,9 @@ EuroGrant_AI_PRD_v1.docx
 *.tsbuildinfo
 next-env.d.ts
 **/next-env.d.ts
-**/tsconfig.tsbuildinfo\r\n\r\n# Temporary scripts\r\ncommit_in_parts.ps1
+**/tsconfig.tsbuildinfo
+
+# Temporary scripts and dev files
+commit_in_parts.ps1
+mcp_request.json
+
