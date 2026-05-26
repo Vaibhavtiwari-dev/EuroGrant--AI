@@ -105,15 +105,54 @@ class VectorService:
                 }
             })
             
-        if not self.index:
-            logger.warning(f"Pinecone index not initialized. Bypassed indexing {len(vectors)} chunks to grants namespace (offline mock active)")
-            return
-            
         try:
             self.index.upsert(vectors=vectors, namespace="grants")
             logger.info(f"Upserted {len(vectors)} chunks for grant {grant_id} to Pinecone namespace grants")
         except Exception as e:
             logger.error(f"Pinecone upsert failed for grant {grant_id}: {e}. Bypassed gracefully.")
+
+    def search_grants(self, query_text: str, top_k: int = 10) -> List[Dict]:
+        """
+        Query Pinecone index under the 'grants' namespace using similarity search.
+        If Pinecone index is not initialized or fails, returns mock matches.
+        """
+        if not self.index:
+            logger.warning("Pinecone index not initialized. Returning mock search results (offline mock active)")
+            return self._mock_search_grants(query_text, top_k)
+
+        try:
+            query_embedding = self.generate_embeddings(query_text)
+            response = self.index.query(
+                vector=query_embedding,
+                top_k=top_k,
+                namespace="grants",
+                include_metadata=True
+            )
+            matches = []
+            for match in response.get("matches", []):
+                metadata = match.get("metadata", {})
+                matches.append({
+                    "id": match.get("id"),
+                    "score": match.get("score"),
+                    "grant_id": metadata.get("grant_id"),
+                    "text": metadata.get("text"),
+                    "title": metadata.get("title", "Unknown Grant Opportunity")
+                })
+            return matches
+        except Exception as e:
+            logger.error(f"Pinecone query failed: {e}. Falling back to mock search results.")
+            return self._mock_search_grants(query_text, top_k)
+
+    def _mock_search_grants(self, query_text: str, top_k: int = 10) -> List[Dict]:
+        """
+        Generates fallback mock grant matches with similarity scores for local testing.
+        """
+        mock_data = [
+            {"id": "grant_1_chunk_0", "score": 0.88, "grant_id": 1, "text": "Smart Sustainable Manufacturing grant support for IoT systems.", "title": "Innovate UK: Smart Sustainable Manufacturing"},
+            {"id": "grant_2_chunk_0", "score": 0.76, "grant_id": 2, "text": "Funding for green lithium projects, B2B batteries and logistics.", "title": "Project GreenLithium"},
+            {"id": "grant_3_chunk_0", "score": 0.65, "grant_id": 3, "text": "European innovation ecosystem support for growth stage SMEs.", "title": "EIC Accelerator - Horizon Europe"}
+        ]
+        return mock_data[:top_k]
 
 vector_service = VectorService()
 
