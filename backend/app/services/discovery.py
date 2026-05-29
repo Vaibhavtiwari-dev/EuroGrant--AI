@@ -72,9 +72,19 @@ class EstoniaGrantScraper(GrantScraper):
 
                 title = title_node.get_text(strip=True)
                 description = desc_node.get_text(strip=True) if desc_node else "Detailed grant specifications on portal."
-                source_url = link_node["href"] if link_node and link_node.has_attr("href") else self.portal_url
-                if not source_url.startswith("http"):
-                    source_url = f"https://www.eas.ee{source_url}"
+                if not link_node or not link_node.has_attr("href"):
+                    href = self.portal_url
+                else:
+                    href = str(link_node["href"])
+                    if not href.startswith("http"):
+                        # Guard against scheme-relative URLs (//example.com) and missing scheme
+                        if href.startswith("//"):
+                            href = f"https:{href}"
+                        else:
+                            href = f"https://www.eas.ee{href}" if href.startswith("/") else self.portal_url
+                    # MED-03: Ensure final URL has an allowed scheme
+                    if not any(href.startswith(scheme) for scheme in ("https://", "http://")):
+                        href = self.portal_url
 
                 # Standardized unique identifier
                 external_id = f"EE-EAS-{i+1:04d}"
@@ -87,7 +97,7 @@ class EstoniaGrantScraper(GrantScraper):
                     "funding_range": "€20,000 - €250,000",
                     "eligibility_criteria": "SME registered in Estonia with less than 250 headcount.",
                     "scoring_rubric": "AI Assessment weighted on: Technical Innovation (40%), Operational capacity (30%), ESG metrics (30%).",
-                    "source_url": source_url,
+                    "source_url": href,
                     "sector_tags": ["SaaS", "GreenTech", "DeepTech"]
                 })
             except Exception as pe:
