@@ -58,6 +58,7 @@ export default function MatchedGrants({ refreshKey = 0 }: MatchedGrantsProps) {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMatches();
   }, [refreshKey, fetchMatches]);
 
@@ -168,7 +169,7 @@ export default function MatchedGrants({ refreshKey = 0 }: MatchedGrantsProps) {
                           <Sparkles size={14} className="text-emerald-light" />
                           <span className="text-[10px] font-black uppercase tracking-widest text-emerald-light">AI Synergy Verdict</span>
                         </div>
-                        <p className="text-xs text-slate-300 leading-relaxed italic">&ldquo;{item.explanation}&rdquo;</p>
+                        <p className="text-xs text-slate-300 leading-relaxed italic">“{item.explanation}”</p>
                       </div>
                     )}
                   </div>

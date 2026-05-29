@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
@@ -95,11 +95,14 @@ export default function GrantSearchPage() {
   }, []);
 
   // Initial Load - Get all available grants
+  const hasInitialLoad = useRef(false);
   useEffect(() => {
-    if (user) {
+    if (user && !hasInitialLoad.current) {
+      hasInitialLoad.current = true;
       handleSearch(true);
     }
-  }, [user, handleSearch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const toggleSector = (sector: string) => {
     setSelectedSectors(prev => 
