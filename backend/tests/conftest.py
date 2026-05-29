@@ -38,11 +38,13 @@ def db_session():
         db.close()
 
 def override_get_db():
+    db = None
     try:
         db = TestingSessionLocal()
         yield db
     finally:
-        db.close()
+        if db is not None:
+            db.close()
 
 app.dependency_overrides[get_db] = override_get_db
 
