@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status, Request
 from sqlalchemy.orm import Session
 from typing import List
 from .. import models, schemas, database
+from ..limiter import limiter
 from ..auth import get_current_user, require_role
 from ..services.s3 import s3_service
 from ..worker import process_company_document
@@ -29,7 +30,9 @@ async def list_company_documents(
     return docs
 
 @router.post("/company-document", response_model=schemas.DocumentOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/minute")
 async def upload_company_document(
+    request: Request,
     file: UploadFile = File(...),
     db: Session = Depends(database.get_db),
     current_user: models.User = Depends(require_role([models.RoleEnum.ADMIN, models.RoleEnum.WRITER]))

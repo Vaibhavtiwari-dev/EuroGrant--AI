@@ -1,13 +1,15 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from sqlalchemy.orm import Session
 from .. import models, schemas, auth, database
+from ..limiter import limiter
 from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
-def register(user_in: schemas.UserCreate, db: Session = Depends(database.get_db)):
+@limiter.limit("5/minute")
+def register(request: Request, user_in: schemas.UserCreate, db: Session = Depends(database.get_db)):
     # Validate invite code - Mandatory environment variable check
     master_invite_code = os.getenv("MASTER_INVITE_CODE")
     if not master_invite_code:
@@ -51,7 +53,8 @@ def register(user_in: schemas.UserCreate, db: Session = Depends(database.get_db)
     return new_user
 
 @router.post("/login", response_model=schemas.Token)
-def login(response: Response, user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, response: Response, user_credentials: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(database.get_db)):
     user = db.query(models.User).filter(models.User.email == user_credentials.username).first()
     
     if not user:
