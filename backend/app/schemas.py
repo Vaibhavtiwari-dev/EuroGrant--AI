@@ -37,9 +37,23 @@ class OrganizationBase(BaseModel):
 
 class OrganizationOut(OrganizationBase):
     id: int
+    match_threshold: float
+    alert_email_enabled: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class OrganizationUpdate(BaseModel):
+    name: Optional[str] = None
+    sector: Optional[str] = None
+    headcount_range: Optional[str] = None
+    revenue_tier: Optional[str] = None
+    legal_entity_type: Optional[str] = None
+    countries_of_operation: Optional[str] = None
+    core_technologies: Optional[str] = None
+    match_threshold: Optional[float] = None
+    alert_email_enabled: Optional[bool] = None
+
 
 # Dashboard Schemas
 class PipelineOut(BaseModel):
@@ -102,6 +116,18 @@ class GrantOut(GrantBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class GrantMatchOut(BaseModel):
+    id: int
+    organization_id: int
+    grant_id: int
+    score: float
+    explanation: Optional[str] = None
+    created_at: datetime
+    grant: GrantOut
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 class GrantSearchRequest(BaseModel):
     query: Optional[str] = None

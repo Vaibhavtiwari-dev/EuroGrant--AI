@@ -26,6 +26,9 @@ class Organization(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
+    match_threshold: Mapped[float] = mapped_column(Float, default=0.7)
+    alert_email_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+
     users: Mapped[List["User"]] = relationship(back_populates="organization")
     proposals: Mapped[List["Proposal"]] = relationship(back_populates="organization")
     documents: Mapped[List["CompanyDocument"]] = relationship(back_populates="organization")
@@ -97,3 +100,17 @@ class Proposal(Base):
 
     organization: Mapped["Organization"] = relationship(back_populates="proposals")
     grant: Mapped["Grant"] = relationship()
+
+class GrantMatch(Base):
+    __tablename__ = "grant_matches"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id"))
+    grant_id: Mapped[int] = mapped_column(ForeignKey("grants.id"))
+    score: Mapped[float] = mapped_column(Float)
+    explanation: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    organization: Mapped["Organization"] = relationship()
+    grant: Mapped["Grant"] = relationship()
+
