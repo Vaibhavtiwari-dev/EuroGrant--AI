@@ -1,9 +1,6 @@
 import pytest
-from app.auth import create_access_token
+from app.auth import create_access_token, get_password_hash, verify_password
 from datetime import timedelta
-
-# Skip hashing tests if passlib/bcrypt are having compatibility issues with Python 3.14
-# but keep token tests for coverage
 
 def test_create_access_token():
     data = {"sub": "test@example.com"}
@@ -16,3 +13,15 @@ def test_token_expiration():
     expires = timedelta(minutes=-1) # Already expired
     token = create_access_token(data, expires_delta=expires)
     assert token is not None
+
+def test_password_hashing():
+    password = "SuperSecretPassword123!"
+    hashed = get_password_hash(password)
+    assert hashed != password
+    assert len(hashed) > 0
+    
+    # Verify correct password matches
+    assert verify_password(password, hashed) is True
+    
+    # Verify incorrect password fails
+    assert verify_password("WrongPassword123", hashed) is False
