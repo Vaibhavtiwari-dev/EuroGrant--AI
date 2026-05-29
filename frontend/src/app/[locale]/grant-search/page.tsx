@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
@@ -48,7 +48,7 @@ export default function GrantSearchPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async (isInitial = false) => {
+  const handleSearch = useCallback(async (isInitial = false) => {
     setIsSearching(true);
     try {
       const payload = {
@@ -83,7 +83,7 @@ export default function GrantSearchPage() {
         setSearched(true);
       }
     }
-  };
+  }, [query, selectedSectors]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -99,7 +99,7 @@ export default function GrantSearchPage() {
     if (user) {
       handleSearch(true);
     }
-  }, [user]);
+  }, [user, handleSearch]);
 
   const toggleSector = (sector: string) => {
     setSelectedSectors(prev => 

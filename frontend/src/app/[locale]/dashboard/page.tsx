@@ -11,6 +11,8 @@ import RAGProgress from "@/components/dashboard/RAGProgress";
 import HotMatches from "@/components/dashboard/HotMatches";
 import CompanyProfile from "@/components/CompanyProfile";
 import DocumentList from "@/components/DocumentList";
+import MatchedGrants from "@/components/dashboard/MatchedGrants";
+import NotificationSettings from "@/components/dashboard/NotificationSettings";
 import { useAuth } from "@/context/AuthContext";
 import { useDocumentPolling } from "@/hooks/useDocumentPolling";
 import { apiFetch } from "@/lib/api";
@@ -70,6 +72,7 @@ export default function DashboardPage() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "matches" | "settings">("overview");
 
   // Auth Guard
   useEffect(() => {
@@ -143,29 +146,80 @@ export default function DashboardPage() {
         className="relative z-10 md:ml-64 pt-12 px-12 pb-32 min-h-screen hero-gradient"
       >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-12 gap-10">
-            <div className="col-span-12 lg:col-span-8 space-y-12">
-              <StatsOverview variants={itemVariants} stats={overview?.stats} />
-              
-              <motion.div variants={itemVariants} className="premium-card p-10 bg-surface/40 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl">
-                <CompanyProfile refreshKey={refreshKey} />
-              </motion.div>
-              
-              <motion.div variants={itemVariants}>
-                <RAGProgress pipelines={overview?.pipelines || []} />
-              </motion.div>
-            </div>
-
-            <div className="col-span-12 lg:col-span-4 space-y-12">
-              <motion.div variants={itemVariants}>
-                <HotMatches matches={overview?.hot_matches || []} />
-              </motion.div>
-              
-              <motion.div variants={itemVariants} className="premium-card p-10 bg-surface/40 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl">
-                <DocumentList refreshKey={refreshKey} />
-              </motion.div>
-            </div>
+          {/* Tab Navigation Menu */}
+          <div className="flex border-b border-white/5 mb-10 gap-8">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${
+                activeTab === "overview" ? "text-emerald-light font-black" : "text-on-surface-variant hover:text-white"
+              }`}
+            >
+              <span>Dashboard Intelligence</span>
+              {activeTab === "overview" && (
+                <motion.div layoutId="activeTabIndicator" className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-light rounded-t-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("matches")}
+              className={`pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${
+                activeTab === "matches" ? "text-emerald-light font-black" : "text-on-surface-variant hover:text-white"
+              }`}
+            >
+              <span>Semantic Matches</span>
+              {activeTab === "matches" && (
+                <motion.div layoutId="activeTabIndicator" className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-light rounded-t-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("settings")}
+              className={`pb-4 text-xs font-bold uppercase tracking-widest transition-all relative ${
+                activeTab === "settings" ? "text-emerald-light font-black" : "text-on-surface-variant hover:text-white"
+              }`}
+            >
+              <span>Alert Preferences</span>
+              {activeTab === "settings" && (
+                <motion.div layoutId="activeTabIndicator" className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-light rounded-t-full" />
+              )}
+            </button>
           </div>
+
+          {activeTab === "overview" && (
+            <div className="grid grid-cols-12 gap-10">
+              <div className="col-span-12 lg:col-span-8 space-y-12">
+                <StatsOverview variants={itemVariants} stats={overview?.stats} />
+                
+                <motion.div variants={itemVariants} className="premium-card p-10 bg-surface/40 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl">
+                  <CompanyProfile refreshKey={refreshKey} />
+                </motion.div>
+                
+                <motion.div variants={itemVariants}>
+                  <RAGProgress pipelines={overview?.pipelines || []} />
+                </motion.div>
+              </div>
+
+              <div className="col-span-12 lg:col-span-4 space-y-12">
+                <motion.div variants={itemVariants}>
+                  <HotMatches matches={overview?.hot_matches || []} />
+                </motion.div>
+                
+                <motion.div variants={itemVariants} className="premium-card p-10 bg-surface/40 backdrop-blur-md rounded-2xl border border-white/5 shadow-xl">
+                  <DocumentList refreshKey={refreshKey} />
+                </motion.div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "matches" && (
+            <motion.div variants={itemVariants}>
+              <MatchedGrants refreshKey={refreshKey} />
+            </motion.div>
+          )}
+
+          {activeTab === "settings" && (
+            <motion.div variants={itemVariants}>
+              <NotificationSettings />
+            </motion.div>
+          )}
         </div>
       </motion.main>
 
