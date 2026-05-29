@@ -1,5 +1,7 @@
 import pytest
 import os
+os.environ["ENVIRONMENT"] = "development"
+
 import uuid
 from unittest.mock import MagicMock, AsyncMock
 from sqlalchemy import create_engine
