@@ -40,6 +40,17 @@ def test_prompt_injection_sanitization():
         assert "```" not in sanitized_content
         assert "Ignore all previous instructions" in sanitized_content
 
+def get_mock_request():
+    from starlette.requests import Request
+    scope = {
+        "type": "http",
+        "method": "POST",
+        "path": "/api/v1/auth/register",
+        "headers": [],
+        "client": ("127.0.0.1", 50000),
+    }
+    return Request(scope)
+
 # Test 2: Hardcoded Invite Code Fix Verification
 def test_hardcoded_invite_code_removed():
     # Ensure environment variable is NOT set
@@ -54,7 +65,7 @@ def test_hardcoded_invite_code_removed():
     
     # Calling register should now raise 500 because env var is missing
     with pytest.raises(HTTPException) as excinfo:
-        register(user_in, mock_db)
+        register(request=get_mock_request(), user_in=user_in, db=mock_db)
     
     assert excinfo.value.status_code == 500
     assert "MASTER_INVITE_CODE environment variable is missing" in excinfo.value.detail
@@ -71,7 +82,7 @@ def test_hardcoded_invite_code_verification_logic():
     
     # Should raise 403 for wrong code
     with pytest.raises(HTTPException) as excinfo:
-        register(user_in, mock_db)
+        register(request=get_mock_request(), user_in=user_in, db=mock_db)
     assert excinfo.value.status_code == 403
     
     # Cleanup
