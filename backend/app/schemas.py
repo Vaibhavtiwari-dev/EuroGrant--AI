@@ -51,7 +51,7 @@ class OrganizationUpdate(BaseModel):
     legal_entity_type: Optional[str] = None
     countries_of_operation: Optional[str] = None
     core_technologies: Optional[str] = None
-    match_threshold: Optional[float] = None
+    match_threshold: Optional[float] = Field(None, ge=0.0, le=1.0)  # 0.0–1.0 probability range
     alert_email_enabled: Optional[bool] = None
 
 

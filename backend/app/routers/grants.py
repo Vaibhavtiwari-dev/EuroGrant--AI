@@ -8,9 +8,10 @@ from datetime import datetime, timezone
 
 from .. import models, schemas, database
 from ..auth import get_current_user
-from ..services.vector_db import vector_service
+from ..services.vector_db import get_vector_service
 from ..services.extraction import extraction_service
 from ..limiter import limiter
+from typing import List, Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ def search_grants(
     # 1. Try Pinecone Vector Search if a search query is present
     if search_req.query:
         try:
-            grant_ids = vector_service.query_grants(search_req.query, limit=search_req.limit * 2)
+            grant_ids = get_vector_service().query_grants(search_req.query, limit=(search_req.limit or 10) * 2)
         except Exception as e:
             logger.warning(f"Semantic search failed or bypassed: {e}. Falling back to standard SQL query.")
 
@@ -62,7 +63,7 @@ def search_grants(
     if search_req.sectors:
         # SQLite / Postgres compatible JSON array lookup fallback:
         # We fetch extra items and filter them in memory to ensure complete compatibility.
-        all_results = query.offset(search_req.offset).limit(search_req.limit * 2).all()
+        all_results = query.offset(search_req.offset or 0).limit((search_req.limit or 10) * 2).all()
         filtered = []
         for grant in all_results:
             try:
@@ -110,7 +111,7 @@ def get_grant_matches(
     # 3. Call search in vector db
     matches_data = []
     try:
-        matches_data = vector_service.search_grants(query_str, top_k=10)
+        matches_data = get_vector_service().search_grants(query_str, top_k=10)
     except Exception as e:
         logger.warning(f"Vector search failed: {e}. Falling back to default SQL listings.")
         
@@ -155,10 +156,10 @@ def get_grant_matches(
                         score=match["score"],
                         explanation=explanation,
                         created_at=datetime.now(timezone.utc),
-                        grant=grant
+                        grant=cast(schemas.GrantOut, grant)
                     )
                 )
-                
+
     # Fallback / Offline Mock: if results are empty, fetch from database and assign calculated scores
     if not results:
         grants = db.query(models.Grant).limit(5).all()
@@ -199,10 +200,10 @@ def get_grant_matches(
                         score=score,
                         explanation=explanation,
                         created_at=datetime.now(timezone.utc),
-                        grant=grant
+                        grant=cast(schemas.GrantOut, grant)
                     )
                 )
-                
+
     # Sort descending by score
     results.sort(key=lambda x: x.score, reverse=True)
     return results
