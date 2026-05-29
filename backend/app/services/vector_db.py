@@ -146,5 +146,40 @@ class VectorService:
             logger.error(f"Pinecone query failed in grants namespace: {e}")
             return []
 
+    def search_grants(self, query_text: str, top_k: int = 10) -> List[Dict]:
+        try:
+            embedding = self.generate_embeddings(query_text)
+        except Exception as e:
+            logger.error(f"Could not generate query embeddings for search_grants: {e}")
+            return []
+            
+        if not self.index:
+            logger.warning("Pinecone index not initialized for search_grants (offline mock active)")
+            return []
+            
+        try:
+            results = self.index.query(
+                vector=embedding,
+                namespace="grants",
+                top_k=top_k,
+                include_metadata=True
+            )
+            matches = []
+            for match in results.get("matches", []):
+                metadata = match.get("metadata", {})
+                grant_id = metadata.get("grant_id")
+                score = match.get("score")
+                if grant_id is not None and score is not None:
+                    matches.append({
+                        "grant_id": int(grant_id),
+                        "score": float(score),
+                        "text": metadata.get("text", "")
+                    })
+            return matches
+        except Exception as e:
+            logger.error(f"Pinecone query failed in search_grants grants namespace: {e}")
+            return []
+
 vector_service = VectorService()
+
 
