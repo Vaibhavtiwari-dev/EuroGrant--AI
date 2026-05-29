@@ -1,7 +1,7 @@
 import boto3
 import os
 from botocore.exceptions import ClientError
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, UploadFile, status
 import logging
 import shutil
 from pathlib import Path
@@ -25,14 +25,27 @@ class S3Service:
             self.local_path.mkdir(parents=True, exist_ok=True)
             logger.info(f"Using local storage at {self.local_path.absolute()}")
 
+    def _validate_local_path(self, s3_key: str) -> Path:
+        """Validate s3_key to prevent path traversal attacks (CWE-22)."""
+        # Reject any path component that tries to escape local_path
+        dest_path = (self.local_path / s3_key).resolve()
+        if not dest_path.is_relative_to(self.local_path.resolve()):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid file path: traversal attempt detected"
+            )
+        return dest_path
+
     async def upload_fileobj(self, file: UploadFile, s3_key: str) -> str:
         if self.storage_backend == 'local':
             try:
-                dest_path = self.local_path / s3_key
+                dest_path = self._validate_local_path(s3_key)
                 dest_path.parent.mkdir(parents=True, exist_ok=True)
                 with dest_path.open("wb") as buffer:
                     shutil.copyfileobj(file.file, buffer)
                 return s3_key
+            except HTTPException:
+                raise
             except Exception as e:
                 logger.error(f"Failed to save locally: {e}")
                 raise HTTPException(status_code=500, detail="Failed to save file to local storage")
@@ -52,8 +65,10 @@ class S3Service:
     def get_fileobj(self, s3_key: str) -> bytes:
         if self.storage_backend == 'local':
             try:
-                dest_path = self.local_path / s3_key
+                dest_path = self._validate_local_path(s3_key)
                 return dest_path.read_bytes()
+            except HTTPException:
+                raise
             except Exception as e:
                 logger.error(f"Failed to read locally: {e}")
                 raise HTTPException(status_code=500, detail="Failed to read file from local storage")
