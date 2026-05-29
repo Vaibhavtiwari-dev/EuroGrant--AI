@@ -1,8 +1,7 @@
-"use client";
-
 import React from "react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/routing";
 import { 
   LayoutDashboard, 
   BarChart2, 
@@ -34,6 +33,7 @@ const sidebarVariants = {
 
 export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen }: SidebarProps) {
   const t = useTranslations("Sidebar");
+  const pathname = usePathname();
 
   return (
     <motion.nav 
@@ -67,42 +67,54 @@ export default function Sidebar({ isMobile, isSidebarOpen, setIsUploadModalOpen 
       </div>
       
       <div className="flex-1 px-4 space-y-2">
-        <SidebarItem icon={<LayoutDashboard size={20} />} label={t("dashboard")} active />
-        <SidebarItem icon={<BarChart2 size={20} />} label={t("analytics")} />
-        <SidebarItem icon={<Search size={20} />} label="Grant Search" />
-        <SidebarItem icon={<FileText size={20} />} label="My Proposals" />
+        <SidebarItem icon={<LayoutDashboard size={20} />} label={t("dashboard")} href="/dashboard" active={pathname === "/dashboard"} />
+        <SidebarItem icon={<BarChart2 size={20} />} label={t("analytics")} href="/analytics" active={pathname === "/analytics"} />
+        <SidebarItem icon={<Search size={20} />} label="Grant Search" href="/grant-search" active={pathname === "/grant-search"} />
+        <SidebarItem icon={<FileText size={20} />} label="My Proposals" href="/proposals" active={pathname === "/proposals"} />
       </div>
 
       <div className="px-4 mt-auto">
-        <SidebarItem icon={<Settings size={20} />} label={t("settings")} />
+        <SidebarItem icon={<Settings size={20} />} label={t("settings")} href="/settings" active={pathname === "/settings"} />
       </div>
     </motion.nav>
   );
 }
 
-function SidebarItem({ icon, label, active = false }: { icon: React.ReactNode; label: string; active?: boolean }) {
+function SidebarItem({ 
+  icon, 
+  label, 
+  href, 
+  active = false 
+}: { 
+  icon: React.ReactNode; 
+  label: string; 
+  href: string; 
+  active?: boolean 
+}) {
   return (
-    <motion.button 
-      whileHover={{ x: 4 }}
-      whileTap={{ scale: 0.98 }}
-      className={`relative w-full flex items-center gap-4 px-5 py-3.5 rounded-lg font-semibold transition-all duration-200 group ${
-        active 
-          ? "text-emerald-light bg-emerald/5 border border-emerald/10 shadow-sm" 
-          : "text-on-surface-variant hover:text-white"
-      }`}
-    >
-      <span className={`transition-all duration-300 ${active ? "text-emerald-light" : "text-on-surface-variant group-hover:text-emerald-light opacity-60 group-hover:opacity-100"}`}>
-        {icon}
-      </span>
-      <span className="text-sm tracking-tight">{label}</span>
-      {active && (
-        <motion.div 
-          layoutId="activeIndicator"
-          className="absolute left-0 w-1 h-6 bg-copper rounded-r-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        />
-      )}
-    </motion.button>
+    <Link href={href} passHref legacyBehavior>
+      <motion.a 
+        whileHover={{ x: 4 }}
+        whileTap={{ scale: 0.98 }}
+        className={`relative w-full flex items-center gap-4 px-5 py-3.5 rounded-lg font-semibold transition-all duration-200 group cursor-pointer ${
+          active 
+            ? "text-emerald-light bg-emerald/5 border border-emerald/10 shadow-sm" 
+            : "text-on-surface-variant hover:text-white"
+        }`}
+      >
+        <span className={`transition-all duration-300 ${active ? "text-emerald-light" : "text-on-surface-variant group-hover:text-emerald-light opacity-60 group-hover:opacity-100"}`}>
+          {icon}
+        </span>
+        <span className="text-sm tracking-tight">{label}</span>
+        {active && (
+          <motion.div 
+            layoutId="activeIndicator"
+            className="absolute left-0 w-1 h-6 bg-copper rounded-r-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          />
+        )}
+      </motion.a>
+    </Link>
   );
 }
