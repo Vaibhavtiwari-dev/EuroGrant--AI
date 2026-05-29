@@ -6,7 +6,7 @@ alembic
 pydantic-settings
 pydantic[email]
 PyJWT
-passlib[bcrypt]
+bcrypt
 python-multipart
 celery
 redis
