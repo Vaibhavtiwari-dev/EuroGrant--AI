@@ -9,12 +9,20 @@ from openai import OpenAI
 logger = logging.getLogger(__name__)
 
 def redact_pii(text: str) -> str:
-    # Redact Emails
-    text = re.sub(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', '[REDACTED_EMAIL]', text)
-    # Redact Phone numbers (more specific pattern: + followed by 7-15 digits, or standard formats)
-    # Matches patterns like +1234567890, (123) 456-7890, 123-456-7890
-    phone_pattern = r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+    # Redact emails — handles standard and Unicode domains
+    text = re.sub(
+        r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', '[REDACTED_EMAIL]', text
+    )
+    # Redact phone numbers — international formats: +XX XXX XXXX, (XXX) XXX-XXXX, etc.
+    phone_pattern = (
+        r'(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+        r'|\+?\d{1,4}[-.\s]?\d{2,4}[-.\s]?\d{2,4}[-.\s]?\d{2,4}'  # international 10+
+    )
     text = re.sub(phone_pattern, '[REDACTED_PHONE]', text)
+    # Redact IBANs — generic pattern for European/international bank accounts
+    text = re.sub(r'\b[A-Z]{2}\d{2}[A-Z0-9]{4,28}\b', '[REDACTED_IBAN]', text)
+    # Redact credit-card-like patterns (matches most 13–19 digit sequences with separators)
+    text = re.sub(r'\b\d{4}[-.\s]?\d{4}[-.\s]?\d{4}[-.\s]?\d{1,7}\b', '[REDACTED_CARD]', text)
     return text
 
 class ExtractionService:
@@ -78,7 +86,8 @@ class ExtractionService:
                 max_tokens=100,
                 temperature=0.7
             )
-            explanation = response.choices[0].message.content.strip()
+            content = response.choices[0].message.content or ""
+            explanation = content.strip()
             # Trim to 250 characters just in case
             if len(explanation) > 250:
                 explanation = explanation[:247] + "..."
