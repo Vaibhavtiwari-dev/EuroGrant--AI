@@ -37,6 +37,8 @@ class NotificationService:
         
         subject = f"🔥 New High-Compatibility Grant Match: {grant_title} ({display_score}% Match)"
         
+        dashboard_url = os.getenv("APP_BASE_URL", "https://eurogrant.ai")
+
         html_body = f"""
         <!DOCTYPE html>
         <html>
@@ -155,7 +157,7 @@ class NotificationService:
                         "{explanation}"
                     </div>
                     
-                    <a href="http://localhost:3000/dashboard" class="action-button">Access Workspace & Draft Proposal</a>
+                    <a href="{dashboard_url}/dashboard" class="action-button">Access Workspace & Draft Proposal</a>
                 </div>
                 <div class="footer">
                     This is an automated intelligence notification from EuroGrant AI.<br/>
