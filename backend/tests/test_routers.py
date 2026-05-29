@@ -8,11 +8,11 @@ from unittest.mock import patch
 client = TestClient(app)
 
 @pytest.fixture(autouse=True)
-def mock_pwd_context():
-    with patch("app.auth.pwd_context") as mock:
-        mock.hash.side_effect = lambda x: f"hashed_{x}"
-        mock.verify.side_effect = lambda p, h: h == f"hashed_{p}"
-        yield mock
+def mock_auth_passwords():
+    with patch("app.auth.get_password_hash") as mock_hash, patch("app.auth.verify_password") as mock_verify:
+        mock_hash.side_effect = lambda x: f"hashed_{x}"
+        mock_verify.side_effect = lambda p, h: h == f"hashed_{p}"
+        yield
 
 def test_auth_login_invalid():
     # Test login with invalid credentials
@@ -22,16 +22,16 @@ def test_auth_login_invalid():
     assert "detail" in response.json()
 
 def test_auth_register_success(db_session):
+    # Ensure MASTER_INVITE_CODE is set for tests
+    os.environ["MASTER_INVITE_CODE"] = "testcode"
     unique_id = str(uuid.uuid4())[:8]
     payload = {
         "email": f"new_{unique_id}@example.com",
         "password": "password123",
         "full_name": "New User",
         "organization_name": f"New Org {unique_id}",
-        "invite_code": os.getenv("MASTER_INVITE_CODE", "testcode")
+        "invite_code": "testcode"
     }
-    # Ensure MASTER_INVITE_CODE is set for tests
-    os.environ["MASTER_INVITE_CODE"] = "testcode"
     
     response = client.post("/api/v1/auth/register", json=payload)
     assert response.status_code == 201
@@ -40,6 +40,7 @@ def test_auth_register_success(db_session):
     assert data["role"] == "admin" # First user in org should be admin
 
 def test_auth_register_duplicate_email(db_session):
+    os.environ["MASTER_INVITE_CODE"] = "testcode"
     unique_id = str(uuid.uuid4())[:8]
     email = f"dup_{unique_id}@example.com"
     payload = {
@@ -47,9 +48,8 @@ def test_auth_register_duplicate_email(db_session):
         "password": "password123",
         "full_name": "User 1",
         "organization_name": f"Org {unique_id}",
-        "invite_code": os.getenv("MASTER_INVITE_CODE", "testcode")
+        "invite_code": "testcode"
     }
-    os.environ["MASTER_INVITE_CODE"] = "testcode"
     
     # First registration
     client.post("/api/v1/auth/register", json=payload)
