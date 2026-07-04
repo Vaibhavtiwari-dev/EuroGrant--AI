@@ -9,7 +9,7 @@ ruff>=0.7.0,<1.0
 mypy>=1.13.0,<2.0
 
 # Security linter (OWASP-style)
-bandit>=1.7.10,<2.0
+bandit>=1.9.4,<2.0
 
 # Dependency vulnerability scanner
 pip-audit>=2.7.0,<3.0
