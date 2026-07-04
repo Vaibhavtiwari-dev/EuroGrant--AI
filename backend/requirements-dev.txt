@@ -3,7 +3,7 @@
 # Pinned with bounded ranges matching the project convention.
 
 # Lint + format (replaces flake8, isort, pyupgrade)
-ruff>=0.7.0,<1.0
+ruff>=0.15.20,<1.0
 
 # Static type check
 mypy>=1.13.0,<2.0
