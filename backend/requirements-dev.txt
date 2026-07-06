@@ -6,7 +6,7 @@
 ruff>=0.15.20,<1.0
 
 # Static type check
-mypy>=1.13.0,<2.0
+mypy>=2.1.0,<3.0
 
 # Security linter (OWASP-style)
 bandit>=1.9.4,<2.0
